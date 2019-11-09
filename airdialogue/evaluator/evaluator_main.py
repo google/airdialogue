@@ -22,16 +22,31 @@ import numpy as np
 import json
 from airdialogue.prepro.tokenlize_lib import tokenlize_kb
 from airdialogue.evaluator.metrics.f1 import f1_score
+from airdialogue.evaluator.infer_utils import evaluate as evaluate_infer
+from airdialogue.evaluator.selfplay_utils import compute_reward as compute_reward2
+
 from tqdm import tqdm
+import tensorflow as tf
 
 
 def add_arguments(parser):
   """Build ArgumentParser."""
   parser.add_argument(
-      '--data', type=str, default='', help='Path to the data file.')
-  parser.add_argument('--kb', type=str, default='', help='Path to the kb file.')
+      '--true_data', type=str, default='', help='Path to the true data file.')
   parser.add_argument(
-      '--pred', type=str, default='', help='Path to the prediction file.')
+      '--true_kb', type=str, default='', help='Path to the kb file.')
+  parser.add_argument(
+      '--pred_data', type=str, default='', help='Path to the prediction file.')
+  parser.add_argument(
+      '--task',
+      type=str,
+      default='infer',
+      help='type of the task, one of |human|infer|selfplay|')
+  parser.add_argument(
+      '--output',
+      type=str,
+      default='score.json',
+      help='output path for score json.')
 
 
 def distance_calculator(flight1, flight2, flight_db):  # flight2 is benchmark
@@ -162,21 +177,16 @@ def process_action(original_action):
       'status']
 
 
-def main(FLAGS):
+def score_human_data(flags):
+  assert flags.true_data and flags.true_kb
   scores = []
-  expanded_kb = expanduser(FLAGS.kb)
-  expanded_data = expanduser(FLAGS.data)
+  expanded_kb = expanduser(flags.kb)
+  expanded_data = expanduser(flags.data)
   f2 = gfile.Open(expanded_kb)
-  cnt = 0
   with gfile.Open(expanded_data) as f:
     for line in tqdm(f):
-      # if cnt % 1000 == 0:
-      #   print cnt
-      cnt += 1
-
       a = json.loads(line)
       line2 = f2.readline()
-
       if a['correct_sapmle'] == False:
         ss = compute_reward(
             process_action(a['action']), process_action(a['expected_action']),
@@ -186,7 +196,50 @@ def main(FLAGS):
         scores.append([1, 1, 1, 1])
   sn = np.array(scores)
   # np.mean(sn[:,0]), np.mean(sn[:,1]),np.mean(sn[:,2]),np.mean(sn[:,3])
-  print 'final score', np.mean(sn[:, 0])
+  score = np.mean(sn[:, 0])
+  print 'final score',score
+  return {'score': score}
+
+def score_inference(flags):
+  assert flags.true_data and flags.pred_data
+  expanded_true_data = expanduser(flags.true_data)
+  expanded_pred_data = expanduser(flags.pred_data)
+  infer_bleu = evaluate_infer(expanded_true_data, expanded_pred_data, 'bleu')
+  print 'infer bleu: ', infer_bleu
+  return {'bleu': infer_bleu}
+
+
+def score_selfplay(flags):
+  assert flags.true_data and flags.true_kb and flags.pred_data
+  # check output
+
+  all_score = []
+  with tf.gfile.GFile(flags.pred_data) as f:
+    for line in f:
+      json_obj = json.loads(line)
+      intent = json_obj['intent']
+      pred_action = json_obj['pred_action'].split(' ')
+      true_action = json_obj['action'].split(' ')
+      utterance = json_obj['utterance']
+      kb = json_obj['kb']
+      score = compute_reward2(pred_action, true_action, kb)
+      all_score.append(score)
+  avg_score = np.mean(score)
+  print "score=", avg_score
+
+  return {"score": avg_score}
+
+
+def main(flags):
+  if flags.task == 'human':
+    score = score_human_data(flags)
+  elif flags.task == 'infer':
+    score = score_inference(flags)
+  else:
+    score = score_selfplay(flags)
+
+  with tf.gfile.GFile(flags.output, 'w') as f:
+    f.write(json.dumps(score))
 
 
 if __name__ == '__main__':

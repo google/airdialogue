@@ -11,6 +11,7 @@ research. This python library contains a collection of tookits that come with th
 - wget
 
 #### Python Packages
+- tensorflow (tested on 1.14.0)
 - tqdm
 - nltk
 - flask (for visualization)
@@ -31,7 +32,7 @@ python setup.py install
 The official scoring function evaluates the predictive results for a trained model and compare it to the AirDialogue dataset.
 
 ```
-airdialogue score --data PATH_TO_DATA_FILE --kb PATH_TO_KB_FILE
+airdialogue score --true_data PATH_TO_DATA_FILE --true_kb PATH_TO_KB_FILE
 ```
 
 #### Context Generation

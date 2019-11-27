@@ -2,7 +2,7 @@
 AirDialogue is a benchmark dataset for goal-oriented dialogue generation
 research. This python library contains a collection of tookits that come with the dataset.
 - [AirDialogue paper][paper]
-- AirDialogue dataset
+- [AirDialogue dataset][data]
 - Reference implementation: [AirDialogue Model][airdialogue_model]
 
 ## Prerequisites
@@ -71,6 +71,6 @@ Visualization tool displays the content of the raw json file.
 airdialogue vis --data_path ./data/airdialogue/json/
 ```
 
-
+[data]: https://storage.googleapis.com/airdialogue/airdialogue_data.tar.gz
 [paper]: https://www.aclweb.org/anthology/D18-1419/
 [airdialogue_model]: https://github.com/google/airdialogue_model

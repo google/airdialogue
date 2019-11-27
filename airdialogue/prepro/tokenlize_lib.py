@@ -178,7 +178,12 @@ def tokenlize_action(action_json, first_name_cat, last_name_cat, flight_cat,
   one arr in the flight arr.
   """
   try:
-    nm1, nm2 = action_json['name'].strip().split(' ')
+    name_arr = action_json['name'].strip().split(' ')
+    if len(name_arr) < 2:  # name_arr has at least one element
+      nm1 = name_arr[0]
+      nm2 = ''
+    else:
+      nm1, nm2 = name_arr
   except:
     print 'name', action_json['name']
   fl_arr = action_json['flight']

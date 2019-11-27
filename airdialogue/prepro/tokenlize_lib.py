@@ -395,8 +395,8 @@ def write_vocabulary(output_file, output_all_vocab_file, word_frequency,
     if f: f.write(special_char + '\n')
   for key in word_frequency:
     if word_frequency[
-        key] >= frequency_cutoff and key not in special_chars and is_ascii(
-            key, keep_non_ascii):
+        key] >= frequency_cutoff and (key not in special_chars) and is_ascii(
+            key, keep_non_ascii) and key:
       if f:
         f.write(key + '\n')
       new_word_frequency.add(key)

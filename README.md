@@ -45,7 +45,7 @@ airdialogue contextgen \
 ```
 
 #### Preprocessing
-AirDialogue proprocess tookie tokenlizes dialogue. Preprocess on AirDialogue data requires 50GB of ram to work.
+AirDialogue proprocess tookie tokenizes dialogue. Preprocess on AirDialogue data requires 50GB of ram to work.
 Parameter job_type is a set of 5 bits separted by `|`, which reqpresents `train|eval|infer|sp-train|sp-eval`.
 Parameter input_type can be either `context` for context only data or `dialogue` for dialogue data with full history.
 ```

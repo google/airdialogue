@@ -20,7 +20,7 @@ from tensorflow import gfile
 from collections import Counter
 import numpy as np
 import json
-from airdialogue.prepro.tokenlize_lib import tokenlize_kb
+from airdialogue.prepro.tokenize_lib import tokenize_kb
 from airdialogue.evaluator.metrics.f1 import f1_score
 from airdialogue.evaluator.infer_utils import evaluate as evaluate_infer
 from airdialogue.evaluator.selfplay_utils import compute_reward as compute_reward2
@@ -190,7 +190,7 @@ def score_human_data(flags):
       if a['correct_sapmle'] == False:
         ss = compute_reward(
             process_action(a['action']), process_action(a['expected_action']),
-            tokenlize_kb(json.loads(line2)))
+            tokenize_kb(json.loads(line2)))
         scores.append(ss)
       else:
         scores.append([1, 1, 1, 1])

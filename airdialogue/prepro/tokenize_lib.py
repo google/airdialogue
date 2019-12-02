@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""library file for tokenlize."""
+"""library file for tokenize."""
 
 import nltk
 import numpy as np
@@ -27,11 +27,11 @@ unk_token = '<unk>'
 list_of_action_tokens_except_name = set([])
 
 
-def tokenlize_kb(kb_json):
-  """This function tokenlizes the knowledge base json."""
+def tokenize_kb(kb_json):
+  """This function tokenizes the knowledge base json."""
 
-  def tokenlize_one_flight(flight_json):
-    """this function tokenlize one flight entry in the knowledge base."""
+  def tokenize_one_flight(flight_json):
+    """this function tokenize one flight entry in the knowledge base."""
     a1, a2 = flight_json['departure_airport'], flight_json['return_airport']
     m1, m2 = flight_json['departure_month'], flight_json['return_month']
     d1, d2 = flight_json['departure_day'], flight_json['return_day']
@@ -64,8 +64,8 @@ def tokenlize_kb(kb_json):
   res = format_tag('res', res)
   flight_arr = []
   for flight in kb_json['kb']:
-    tokenlized_flight = tokenlize_one_flight(flight)
-    flight_arr.append(tokenlized_flight)
+    tokenized_flight = tokenize_one_flight(flight)
+    flight_arr.append(tokenized_flight)
   list_of_action_tokens_except_name.add(res)
   return res + ' ' + ' '.join(flight_arr)
 
@@ -75,7 +75,7 @@ def process_kb(raw_kb, word_map):
   processed_data = []
   for kb_object in tqdm(raw_kb, desc='proess kb'):
     # the database will be flattened into a single sequence of tokens.
-    flattened = tokenlize_kb(kb_object)
+    flattened = tokenize_kb(kb_object)
     processed_data.append(flattened)
     word_map = apply_word_map(flattened, word_map)
   return processed_data, word_map
@@ -140,8 +140,8 @@ def add_dash_to_name(original_name):
   return '_'.join(original_name.split(' '))
 
 
-def tokenlize_intent(intent_json):
-  """This function tokenlizes intents."""
+def tokenize_intent(intent_json):
+  """This function tokenizes intents."""
   a1, a2 = intent_json['departure_airport'], intent_json['return_airport']
   m1, m2 = intent_json['departure_month'], intent_json['return_month']
   d1, d2 = intent_json['departure_day'], intent_json['return_day']
@@ -169,7 +169,7 @@ def tokenlize_intent(intent_json):
   return ' '.join(arr)
 
 
-def tokenlize_action(action_json, first_name_cat, last_name_cat, flight_cat,
+def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
                      state_cat):
   """Both name and flight will always be in the action.
 
@@ -178,12 +178,7 @@ def tokenlize_action(action_json, first_name_cat, last_name_cat, flight_cat,
   one arr in the flight arr.
   """
   try:
-    name_arr = action_json['name'].strip().split(' ')
-    if len(name_arr) < 2:  # name_arr has at least one element
-      nm1 = name_arr[0]
-      nm2 = ''
-    else:
-      nm1, nm2 = name_arr
+    nm1, nm2 = action_json['name'].strip().split(' ')
   except:
     print 'name', action_json['name']
   fl_arr = action_json['flight']
@@ -220,8 +215,8 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   def process_dialogue(dialogue):
     """This function processes dialogues."""
 
-    def do_tokenlize(last, turn):
-      """This function tokenlizes the diloagues of a specific turn."""
+    def do_tokenize(last, turn):
+      """This function tokenizes the diloagues of a specific turn."""
       if turn.startswith('customer: '):
         # agent:
         turn = turn[10:].strip()
@@ -232,24 +227,24 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
         sot = start_of_turn2
         eot = start_of_turn1
       sentences = sent_tok(turn)
-      tokenlized_sents = []
+      tokenized_sents = []
       for s in sentences:
         words = word_tok(s)
-        tokenlized_sents.append(' '.join(words))
-      flat_content = ' '.join(tokenlized_sents)
+        tokenized_sents.append(' '.join(words))
+      flat_content = ' '.join(tokenized_sents)
       if last:
         return sot + ' ' + flat_content + ' ' + end_of_dialogue + ' ' + eot
       else:
         return sot + ' ' + flat_content
 
-    tokenlized_dialogue = []
+    tokenized_dialogue = []
     max_turn_length = 0
     for i, turn in enumerate(dialogue):
-      tokenlized_turn = do_tokenlize(i == len(dialogue) - 1, turn)
-      max_turn_length = max(max_turn_length, len(tokenlized_turn.split(' ')))
-      tokenlized_dialogue.append(tokenlized_turn)
+      tokenized_turn = do_tokenize(i == len(dialogue) - 1, turn)
+      max_turn_length = max(max_turn_length, len(tokenized_turn.split(' ')))
+      tokenized_dialogue.append(tokenized_turn)
 
-    return ' '.join(tokenlized_dialogue), max_turn_length
+    return ' '.join(tokenized_dialogue), max_turn_length
 
   def get_dialogue_boundary(start_token, flat_dialogue):
     """This function gets the boundary array of the dialogues."""
@@ -315,16 +310,19 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
     intent = loaded_json['intent']
     action = loaded_json['action']
     expected_action = loaded_json['expected_action']
-    processed_intent = tokenlize_intent(get_full_intent(intent))
+    processed_intent = tokenize_intent(get_full_intent(intent))
     # print "processed_intent", processed_intent
-    processed_action = tokenlize_action(
-        action,
-        first_name_cat,
-        last_name_cat,
-        flight_cat,
-        state_cat,
-    )
-    processed_expected_action = tokenlize_action(
+    try:
+      processed_action = tokenize_action(
+          action,
+          first_name_cat,
+          last_name_cat,
+          flight_cat,
+          state_cat,
+      )
+    except:
+      print loaded_json
+    processed_expected_action = tokenize_action(
         expected_action,
         first_name_cat,
         last_name_cat,
@@ -395,8 +393,8 @@ def write_vocabulary(output_file, output_all_vocab_file, word_frequency,
     if f: f.write(special_char + '\n')
   for key in word_frequency:
     if word_frequency[
-        key] >= frequency_cutoff and (key not in special_chars) and is_ascii(
-            key, keep_non_ascii) and key:
+        key] >= frequency_cutoff and key not in special_chars and is_ascii(
+            key, keep_non_ascii):
       if f:
         f.write(key + '\n')
       new_word_frequency.add(key)

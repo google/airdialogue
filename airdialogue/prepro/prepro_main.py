@@ -12,24 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This file only tokenlize one file at a time."""
+"""This file only tokenize one file at a time."""
 
 import argparse
 import os
 import nltk
 from tensorflow import gfile
-from airdialogue.prepro.tokenlize_lib import list_of_action_tokens_except_name
-from airdialogue.prepro.tokenlize_lib import process_kb
-from airdialogue.prepro.tokenlize_lib import process_main_data
-from airdialogue.prepro.tokenlize_lib import word_tokenize
-from airdialogue.prepro.tokenlize_lib import write_cat
-from airdialogue.prepro.tokenlize_lib import write_completion
-from airdialogue.prepro.tokenlize_lib import write_data
-from airdialogue.prepro.tokenlize_lib import write_self_play
-from airdialogue.prepro.tokenlize_lib import write_vocabulary
+from airdialogue.prepro.tokenize_lib import list_of_action_tokens_except_name
+from airdialogue.prepro.tokenize_lib import process_kb
+from airdialogue.prepro.tokenize_lib import process_main_data
+from airdialogue.prepro.tokenize_lib import word_tokenize
+from airdialogue.prepro.tokenize_lib import write_cat
+from airdialogue.prepro.tokenize_lib import write_completion
+from airdialogue.prepro.tokenize_lib import write_data
+from airdialogue.prepro.tokenize_lib import write_self_play
+from airdialogue.prepro.tokenize_lib import write_vocabulary
 
-from airdialogue.prepro.standardlize_data_lib import standardlize_and_drop
-from airdialogue.prepro.standardlize_data_lib import load_and_drop
+from airdialogue.prepro.standardize_data_lib import standardize_and_drop
+from airdialogue.prepro.standardize_data_lib import load_and_drop
 
 
 def add_arguments(parser):
@@ -54,10 +54,10 @@ def add_arguments(parser):
   parser.add_argument('--verbose', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, debug info will be printed out.')
-  parser.add_argument('--skip_standardlize', type='bool', nargs='?', const=True,
+  parser.add_argument('--skip_standardize', type='bool', nargs='?', const=True,
                       default=False,
                       help='''if enabled, dialogues will skip the
-                              standardlization process, which includes
+                              standardization process, which includes
                               removeing duplicated end of sentence tokens and
                               filtering out non-ascii characters.''')
   parser.add_argument('--keep_incorrect', type='bool', nargs='?', const=True,
@@ -141,7 +141,7 @@ def main(FLAGS):
     print 'data_file', FLAGS.data_file
     print 'kb_file', FLAGS.kb_file
     print 'output_prefix', FLAGS.output_prefix
-    print 'skip_standardlize', FLAGS.skip_standardlize
+    print 'skip_standardize', FLAGS.skip_standardize
     print 'keep_incorrect', FLAGS.keep_incorrect
     print 'word_cutoff', FLAGS.word_cutoff
     print 'gen_voc', FLAGS.gen_voc
@@ -178,9 +178,9 @@ def main(FLAGS):
   sent_tokenize = nltk.sent_tokenize
 
   vocal_map = {}
-  # load data and do standardlization
-  if not FLAGS.skip_standardlize:
-    raw_data, raw_kb = standardlize_and_drop(
+  # load data and do standardization
+  if not FLAGS.skip_standardize:
+    raw_data, raw_kb = standardize_and_drop(
         input_data_file,
         input_kb_file,
         drop_incorrect=not FLAGS.keep_incorrect,

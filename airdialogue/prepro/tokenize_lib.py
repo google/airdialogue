@@ -392,6 +392,8 @@ def write_vocabulary(output_file, output_all_vocab_file, word_frequency,
   for special_char in special_chars:
     if f: f.write(special_char + '\n')
   for key in word_frequency:
+    # We write to the vocabulary only when the key is not empty.
+    # Otherwise tensorflow will complain.
     if word_frequency[
         key] >= frequency_cutoff and key not in special_chars and is_ascii(
             key, keep_non_ascii):

@@ -38,7 +38,6 @@ def evaluate(ref_file, trans_file, metric):
   return evaluation_score
 
 
-# Follow //transconsole/localization/machine_translation/metrics/bleu_calc.py
 def _bleu(ref_file, trans_file):
   """Compute BLEU scores and handling BPE."""
   max_order = 4

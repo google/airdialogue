@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""library to standardlize data."""
+"""library to standardize data."""
 
 from tensorflow import gfile
 from tqdm import tqdm
@@ -63,7 +63,7 @@ def delete_non_ascii(s):
 
 
 def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
-  """ this function filter incorrect samples without standardlization.
+  """ this function filter incorrect samples without standardization.
   """
   fin_data = gfile.FastGFile(data_file)
   fin_kb = gfile.FastGFile(kb_file)
@@ -93,13 +93,13 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
   return loaded_data, loaded_kb
 
 
-def standardlize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
-  """ this function filter incorrect samples and standardlize them
+def standardize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
+  """ this function filter incorrect samples and standardize them
    the same time.
   """
   loaded_data, loaded_kb = load_and_drop(
       data_file, kb_file, drop_incorrect, verbose)
-  for data_obj in tqdm(loaded_data, desc='standardlizing data'):
+  for data_obj in tqdm(loaded_data, desc='standardizing data'):
     org_time = data_obj['timestamps'] if 'timestamps' in data_obj else None
     org_diag = data_obj['dialogue'] if 'dialogue' in data_obj else None
     if org_diag:

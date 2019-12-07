@@ -22,7 +22,7 @@ greeting_pairs = [('Hello.', 'Hi.'), ('Hey, how are you.',
                   ('Hi.', 'Hello.'), ('How is it going?',
                                       'I am good. Thank you.')]
 
-# spaces will be processed in tokenlizer
+# spaces will be processed in tokenizer
 agent_ask = ['How can I help you today?', 'What can I do for you today?']
 
 customer_request = {

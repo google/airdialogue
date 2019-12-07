@@ -173,7 +173,6 @@ def main(FLAGS):
   output_kb_pattern = output_dir + '/{0}kb'
 
   nltk_path = FLAGS.ntlk_data
-                           )
   nltk.data.path.append(nltk_path)
   sent_tokenize = nltk.sent_tokenize
 

@@ -16,10 +16,12 @@
 
 import argparse
 from os.path import expanduser
-from tensorflow import gfile
+from tensorflow.io import gfile
 from collections import Counter
 import numpy as np
 import json
+import sys
+
 from airdialogue.prepro.tokenlize_lib import tokenlize_kb
 from airdialogue.evaluator.metrics.f1 import f1_score
 from airdialogue.evaluator.infer_utils import evaluate as evaluate_infer
@@ -28,6 +30,7 @@ from airdialogue.evaluator.selfplay_utils import compute_reward as compute_rewar
 from tqdm import tqdm
 import tensorflow as tf
 
+FLAGS = None
 
 def add_arguments(parser):
   """Build ArgumentParser."""
@@ -242,8 +245,11 @@ def main(flags):
     f.write(json.dumps(score))
 
 
+def run_main(unused):
+  main(FLAGS)
+
 if __name__ == '__main__':
   this_parser = argparse.ArgumentParser()
   add_arguments(this_parser)
   FLAGS, unparsed = this_parser.parse_known_args()
-  main(FLAGS)
+  tf.app.run(main=run_main, argv=[sys.argv[0]] + unparsed)

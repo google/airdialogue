@@ -18,11 +18,14 @@ import argparse
 import json
 from tensorflow import gfile as gfile
 import tensorflow as tf
+import sys
+
 from airdialogue.context_generator import context_generator_lib
 from airdialogue.context_generator.src import utils
 
 from airdialogue.simulator import interaction
 
+FLAGS=None
 
 def add_arguments(parser):
   """Build ArgumentParser."""
@@ -110,14 +113,19 @@ def main(FLAGS):
                       "action": standarlized_action,
                       "expected_action": standarlized_expected_action}) + "\n")
       dumped_kb = kb.get_json()
-      qq=json.dumps(dumped_kb) + "\n"
       f_kb.write(json.dumps(dumped_kb) + "\n")
+
+
+def run_main(unused):
+  main(FLAGS)
+
 
 if __name__ == "__main__":
   this_parser = argparse.ArgumentParser()
   add_arguments(this_parser)
   FLAGS, unparsed = this_parser.parse_known_args()
-  main(FLAGS)
+  # main(FLAGS)
+  tf.app.run(main=run_main, argv=[sys.argv[0]] + unparsed)
 
 
 

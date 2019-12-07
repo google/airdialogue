@@ -18,6 +18,7 @@ import argparse
 import os
 import nltk
 from tensorflow import gfile
+
 from airdialogue.prepro.tokenize_lib import list_of_action_tokens_except_name
 from airdialogue.prepro.tokenize_lib import process_kb
 from airdialogue.prepro.tokenize_lib import process_main_data
@@ -27,10 +28,9 @@ from airdialogue.prepro.tokenize_lib import write_completion
 from airdialogue.prepro.tokenize_lib import write_data
 from airdialogue.prepro.tokenize_lib import write_self_play
 from airdialogue.prepro.tokenize_lib import write_vocabulary
-
+# Standardization libs
 from airdialogue.prepro.standardize_data_lib import standardize_and_drop
 from airdialogue.prepro.standardize_data_lib import load_and_drop
-
 
 def add_arguments(parser):
   '''Build ArgumentParser.'''
@@ -173,7 +173,6 @@ def main(FLAGS):
   output_kb_pattern = output_dir + '/{0}kb'
 
   nltk_path = FLAGS.ntlk_data
-                           )
   nltk.data.path.append(nltk_path)
   sent_tokenize = nltk.sent_tokenize
 

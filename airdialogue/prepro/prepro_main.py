@@ -18,6 +18,7 @@ import argparse
 import os
 import nltk
 from tensorflow import gfile
+import tensorflow as tf
 
 from airdialogue.prepro.tokenize_lib import list_of_action_tokens_except_name
 from airdialogue.prepro.tokenize_lib import process_kb
@@ -31,7 +32,6 @@ from airdialogue.prepro.tokenize_lib import write_vocabulary
 # Standardization libs
 from airdialogue.prepro.standardize_data_lib import standardize_and_drop
 from airdialogue.prepro.standardize_data_lib import load_and_drop
-
 import sys
 FLAGS = None
 

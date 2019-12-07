@@ -178,7 +178,12 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
   one arr in the flight arr.
   """
   try:
-    nm1, nm2 = action_json['name'].strip().split(' ')
+    name_arr = action_json['name'].strip().split(' ')
+    if len(name_arr) < 2:  # name_arr has at least one element
+      nm1 = name_arr[0]
+      nm2 = ''
+    else:
+      nm1, nm2 = name_arr
   except:
     print 'name', action_json['name']
   fl_arr = action_json['flight']
@@ -312,16 +317,13 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
     expected_action = loaded_json['expected_action']
     processed_intent = tokenize_intent(get_full_intent(intent))
     # print "processed_intent", processed_intent
-    try:
-      processed_action = tokenize_action(
-          action,
-          first_name_cat,
-          last_name_cat,
-          flight_cat,
-          state_cat,
-      )
-    except:
-      print loaded_json
+    processed_action = tokenize_action(
+        action,
+        first_name_cat,
+        last_name_cat,
+        flight_cat,
+        state_cat,
+    )
     processed_expected_action = tokenize_action(
         expected_action,
         first_name_cat,

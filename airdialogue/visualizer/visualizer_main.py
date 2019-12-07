@@ -22,7 +22,7 @@ from os.path import expanduser
 from flask import Flask
 from flask import request
 from airdialogue.visualizer.utils import generate_html
-
+import sys
 
 def strip_prefix(name):
   if name.endswith("data"):

@@ -16,7 +16,10 @@
 
 import argparse
 from airdialogue.context_generator import context_generator_lib
+import tensorflow as tf
+import sys
 
+FLAGS= None
 
 def add_arguments(parser):
   """Build ArgumentParser."""
@@ -90,11 +93,14 @@ def main(FLAGS):
                                  verbose=FLAGS.verbose)
   if FLAGS.verbose: print stats
 
+
+def run_main(unused):
+  main(FLAGS)
+
 if __name__ == "__main__":
   this_parser = argparse.ArgumentParser()
   add_arguments(this_parser)
   FLAGS, unparsed = this_parser.parse_known_args()
-  main(FLAGS)
-
+  tf.app.run(main=run_main, argv=[sys.argv[0]] + unparsed)
 
 

@@ -18,6 +18,7 @@ import argparse
 import os
 import nltk
 from tensorflow import gfile
+import tensorflow as tf
 from airdialogue.prepro.tokenlize_lib import list_of_action_tokens_except_name
 from airdialogue.prepro.tokenlize_lib import process_kb
 from airdialogue.prepro.tokenlize_lib import process_main_data
@@ -30,7 +31,9 @@ from airdialogue.prepro.tokenlize_lib import write_vocabulary
 # Standardization libs
 from airdialogue.prepro.standardlize_data_lib import standardlize_and_drop
 from airdialogue.prepro.standardlize_data_lib import load_and_drop
+import sys
 
+FLAGS = None
 
 def add_arguments(parser):
   '''Build ArgumentParser.'''
@@ -146,7 +149,7 @@ def main(FLAGS):
     print 'word_cutoff', FLAGS.word_cutoff
     print 'gen_voc', FLAGS.gen_voc
 
-  if not gfile.IsDirectory(output_dir):
+  if not tf.io.gfile.isdir(output_dir):
     gfile.MkDir(output_dir)
 
   input_data_file = FLAGS.data_file
@@ -264,8 +267,13 @@ def main(FLAGS):
     f_tokens.close()
 
 
+def run_main(unused):
+  main(FLAGS)
+
+
 if __name__ == '__main__':
   this_parser = argparse.ArgumentParser()
   add_arguments(this_parser)
   FLAGS, unparsed = this_parser.parse_known_args()
-  main(FLAGS)
+  # print FLAGS
+  tf.app.run(main=run_main, argv=[sys.argv[0]] + unparsed)

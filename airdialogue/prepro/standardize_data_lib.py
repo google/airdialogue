@@ -14,7 +14,7 @@
 
 """library to standardize data."""
 
-from tensorflow import gfile
+from tensorflow.compat.v1 import gfile
 from tqdm import tqdm
 import string
 import json

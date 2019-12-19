@@ -20,7 +20,7 @@ import copy
 import json
 import random
 import numpy as np
-from tensorflow import gfile
+from tensorflow.compat.v1 import gfile
 from airdialogue.context_generator.src import customer
 from airdialogue.context_generator.src import facts
 from airdialogue.context_generator.src import kb as knowledgebase

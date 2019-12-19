@@ -14,7 +14,7 @@
 
 """Utility function for the visualizer."""
 import json
-from tensorflow import gfile
+from tensorflow.compat.v1 import gfile
 
 
 def generate_kv_nested_html(nested_kv, space):

@@ -73,7 +73,7 @@ def tokenize_kb(kb_json):
 def process_kb(raw_kb, word_map):
   """main entry to process kb."""
   processed_data = []
-  for kb_object in tqdm(raw_kb, desc='proess kb'):
+  for kb_object in tqdm(raw_kb, desc='process kb'):
     # the database will be flattened into a single sequence of tokens.
     flattened = tokenize_kb(kb_object)
     processed_data.append(flattened)
@@ -215,7 +215,7 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
 # Right now expected action is not used only one flight is considered.
 def process_main_data(raw_data, sent_tok, word_tok, word_map,
                       input_type):
-  """This function process the main data."""
+  """This function processes the main data."""
 
   def process_dialogue(dialogue):
     """This function processes dialogues."""

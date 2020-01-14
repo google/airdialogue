@@ -29,7 +29,7 @@ def add_dot(utt):
     return utt.strip()
 
 
-def standarlize_message(utterances, time_stamp=None):
+def standardize_message(utterances, time_stamp=None):
   """this function combines adjacent utternaces that belong to the same talker
      into one. Sometimes time_stamp could be None.
      For example
@@ -82,7 +82,7 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
     data_obj = json.loads(line1)
     kb_obj = json.loads(line2)
     if (not drop_incorrect) or (
-        'correct_sapmle' not in data_obj) or data_obj['correct_sapmle']:
+        'correct_sample' not in data_obj) or data_obj['correct_sample']:
       loaded_data.append(data_obj)
       loaded_kb.append(kb_obj)
     total_in_file += 1
@@ -103,7 +103,7 @@ def standardize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
     org_time = data_obj['timestamps'] if 'timestamps' in data_obj else None
     org_diag = data_obj['dialogue'] if 'dialogue' in data_obj else None
     if org_diag:
-      new_diag, new_time = standarlize_message(org_diag, org_time)
+      new_diag, new_time = standardize_message(org_diag, org_time)
       data_obj['dialogue'] = new_diag
       if new_time:
         data_obj['timestamps'] = new_time

@@ -191,7 +191,7 @@ def score_human_data(flags):
     for line in tqdm(f):
       a = json.loads(line)
       line2 = f2.readline()
-      if a['correct_sapmle'] == False:
+      if a['correct_sample'] == False:
         ss = compute_reward(
             process_action(a['action']), process_action(a['expected_action']),
             tokenize_kb(json.loads(line2)))

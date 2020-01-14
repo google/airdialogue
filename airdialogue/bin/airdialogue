@@ -10,11 +10,13 @@ from airdialogue.prepro.prepro_main import add_arguments as add_arguments_pr
 from airdialogue.simulator.simulator_main import add_arguments as add_arguments_sim
 from airdialogue.visualizer.visualizer_main import add_arguments as add_arguments_vis
 from airdialogue.evaluator.evaluator_main import add_arguments as add_arguments_eval
+from airdialogue.generate_infer.generate_infer_main import add_arguments as add_arguments_gen
 from airdialogue.context_generator.context_generator_main import main as main_cx
 from airdialogue.prepro.prepro_main import main as main_pr
 from airdialogue.simulator.simulator_main import main as main_sim
 from airdialogue.visualizer.visualizer_main import main as main_vis
 from airdialogue.evaluator.evaluator_main import main as main_eval
+from airdialogue.generate_infer.generate_infer_main import main as main_gen
 
 if __name__ == "__main__":
   if len(sys.argv) == 1:
@@ -41,5 +43,9 @@ if __name__ == "__main__":
       add_arguments_eval(this_parser)
       FLAGS, unparsed = this_parser.parse_known_args()
       main_eval(FLAGS)
+    elif sys.argv[1] == 'generate_infer':
+      add_arguments_gen(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_gen(FLAGS)
     else:
       raise ValueError('Argument not expected.')

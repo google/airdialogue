@@ -72,8 +72,7 @@ def write_infer_json(data, kb, output_file_src, output_file_tgt
       f_kb.write(json_dump(entry_kb) + '\n')
       entry['dialogue'] = entire_dialogue[0:target_turn]
       f_src.write(json_dump(entry) + '\n')
-      clean_string = "".join(entire_dialogue[target_turn].split(":")[1:])
-      f_tgt.write(clean_string + '\n')
+      f_tgt.write(json_dump({'response': entire_dialogue[target_turn]}) + '\n')
 
   f_src.close()
   f_tgt.close()
@@ -98,7 +97,6 @@ def main(FLAGS):
     FLAGS.output_prefix = FLAGS.output_prefix
 
   output_data_pattern = output_dir + '/{0}data.json'
-  output_data_txt_pattern = output_dir + '/{0}data.txt'
   output_kb_pattern = output_dir + '/{0}kb.json'
 
   # load data and do standardization
@@ -111,7 +109,7 @@ def main(FLAGS):
   write_infer_json(
       raw_data, raw_kb,
       output_data_pattern.format(FLAGS.output_prefix + '_infer_src_'),
-      output_data_txt_pattern.format(FLAGS.output_prefix + '_infer_tar_'),
+      output_data_pattern.format(FLAGS.output_prefix + '_infer_tgt_'),
       output_kb_pattern.format(FLAGS.output_prefix+ '_infer_'))
 
 

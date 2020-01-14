@@ -87,7 +87,7 @@ def _rouge(ref_file, summarization_file):
 
 
 def process_dialogue_infer(file_line):
-  return file_line[0:-1]  # get ride of the end token
+  return file_line.split("|")[1][0:-1]  # get ride of the end token
 
 
 def _accuracy(label_file, pred_file):

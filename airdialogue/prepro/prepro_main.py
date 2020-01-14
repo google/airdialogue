@@ -57,6 +57,12 @@ def add_arguments(parser):
   parser.add_argument('--verbose', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, debug info will be printed out.')
+  parser.add_argument('--skip_standardize', type='bool', nargs='?', const=True,
+                      default=False,
+                      help='''if enabled, dialogues will skip the
+                              standardization process, which includes
+                              removeing duplicated end of sentence tokens and
+                              filtering out non-ascii characters.''')
   parser.add_argument('--keep_incorrect', type='bool', nargs='?', const=True,
                       default=False,
                       help='''if enabled, incorrect dialogues will not be
@@ -77,10 +83,6 @@ def add_arguments(parser):
   parser.add_argument('--keep_non_ascii', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, non-ascii tokens will not be droped in vocabulary')
-  parser.add_argument('--infer_src_data_file', type=str, default=None,
-                      help='path for infer_src_data_file')
-  parser.add_argument('--infer_kb_file', type=str, default=None,
-                      help='path for infer_kb_file')
 
 
 def generate_entry(intents, actions, expected_actions, dialogues, kbs,
@@ -131,48 +133,6 @@ def process_job_type(job_type_str, input_type):
     assert 'infer' not in all_jobs
   return all_jobs
 
-def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
-    output_all_vab, gen_cat):
-  vocal_map = {}
-  sent_tokenize = nltk.sent_tokenize
-  
-  raw_data, raw_kb = load_and_drop(
-      input_data_file,
-      input_kb_file,
-      drop_incorrect=not FLAGS.keep_incorrect,
-      verbose=FLAGS.verbose)
-  # has to be there no matter what
-  if FLAGS.verbose: print 'processing kb'
-  processed_kb, vocal_map = process_kb(raw_kb, vocal_map)
-  # if dialogue, everything will be there.
-  # if context, only intents, actions, vocal_map will be there
-  if FLAGS.verbose: print 'processing data'
-  result = process_main_data(
-      raw_data,
-      sent_tokenize,
-      word_tokenize,
-      vocal_map,
-      input_type=FLAGS.input_type)
-  intents, actions, expected_actions, dialogues, vocal_map, boundaries1, boundaries2, cats = result
-  frequency_cutoff = FLAGS.word_cutoff
-  # 3 is the number of special tokens
-  if FLAGS.verbose: print 'vocabulary before cutoff', len(vocal_map) + 3
-  vocal_map = write_vocabulary(output_vab, output_all_vab, vocal_map,
-                               frequency_cutoff, FLAGS.keep_non_ascii)
-  if gen_cat:
-    if FLAGS.verbose: print 'writing category'
-    cat_files = [
-        first_name_cats_file, last_name_cats_file, flight_cats_file,
-        status_cats_file
-    ]
-    write_cat(cat_files, cats)
-
-  if FLAGS.verbose:
-    print 'frequency_cutoff= {0}, vocabulary after cutoff'.format(
-        frequency_cutoff), len(vocal_map)
-  data = reorganize_data(intents, actions, expected_actions, dialogues,
-                         processed_kb, boundaries1, boundaries2)
-  return data
 
 def main(FLAGS):
   all_jobs = process_job_type(FLAGS.job_type, FLAGS.input_type)
@@ -188,8 +148,6 @@ def main(FLAGS):
     print 'keep_incorrect', FLAGS.keep_incorrect
     print 'word_cutoff', FLAGS.word_cutoff
     print 'gen_voc', FLAGS.gen_voc
-    print 'infer_src_data_file', FLAGS.infer_src_data_file
-    print 'infer_kb_file', FLAGS.infer_kb_file
 
   if not tf.io.gfile.isdir(output_dir):
     gfile.MkDir(output_dir)
@@ -217,20 +175,60 @@ def main(FLAGS):
   output_data_pattern = output_dir + '/{0}data'
   output_kb_pattern = output_dir + '/{0}kb'
 
-  nltk_path = FLAGS.nltk_data
+  nltk_path = FLAGS.ntlk_data
   nltk.data.path.append(nltk_path)
+  sent_tokenize = nltk.sent_tokenize
 
-  infer_flag_exists = FLAGS.infer_src_data_file and FLAGS.infer_kb_file
+  vocal_map = {}
+  # load data and do standardization
+  if not FLAGS.skip_standardize:
+    raw_data, raw_kb = standardize_and_drop(
+        input_data_file,
+        input_kb_file,
+        drop_incorrect=not FLAGS.keep_incorrect,
+        verbose=FLAGS.verbose)
+  else:
+    raw_data, raw_kb = load_and_drop(
+        input_data_file,
+        input_kb_file,
+        drop_incorrect=not FLAGS.drop_incorrect,
+        verbose=FLAGS.verbose)
+  # has to be there no matter what
+  if FLAGS.verbose: print 'processing kb'
+  processed_kb, vocal_map = process_kb(raw_kb, vocal_map)
+  # if dialogue, everything will be there.
+  # if context, only intents, actions, vocal_map will be there
+  if FLAGS.verbose: print 'processing data'
+  result = process_main_data(
+      raw_data,
+      sent_tokenize,
+      word_tokenize,
+      vocal_map,
+      input_type=FLAGS.input_type)
+  intents, actions, expected_actions, dialogues, vocal_map, boundaries1, boundaries2, cats = result
+  frequency_cutoff = FLAGS.word_cutoff
+  # 3 is the number of special tokens
+  if FLAGS.verbose: print 'vocabulary before cutoff', len(vocal_map) + 3
+  if not FLAGS.gen_voc:
+    # if we choose not to generate vocabulary file, we set output_vab to None
+    output_vab = None
+  if not FLAGS.gen_voc_map:
+    output_all_vab = None
+  vocal_map = write_vocabulary(output_vab, output_all_vab, vocal_map,
+                               frequency_cutoff, FLAGS.keep_non_ascii)
+  if FLAGS.gen_cat:
+    if FLAGS.verbose: print 'writing category'
+    cat_files = [
+        first_name_cats_file, last_name_cats_file, flight_cats_file,
+        status_cats_file
+    ]
+    write_cat(cat_files, cats)
 
-  if any(j != 'infer' for j in all_jobs) or not infer_flag_exists:
-    # We need to process the default json
-    data = load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
-      output_all_vab, FLAGS.gen_cat)
-
-  if 'infer' in all_jobs and infer_flag_exists:
-    # We need to process alternate infer json
-    alt_infer_data = load_data_from_jsons(FLAGS, FLAGS.infer_src_data_file,
-      FLAGS.infer_kb_file, None, None, False)
+  if FLAGS.verbose:
+    print 'frequency_cutoff= {0}, vocabulary after cutoff'.format(
+        frequency_cutoff), len(vocal_map)
+  data = reorganize_data(intents, actions, expected_actions, dialogues,
+                         processed_kb, boundaries1, boundaries2)
 
   if 'train' in all_jobs:
     if FLAGS.verbose:
@@ -244,15 +242,10 @@ def main(FLAGS):
                output_kb_pattern.format(FLAGS.output_prefix + '.eval.'))
   if 'infer' in all_jobs:
     if FLAGS.verbose: print 'writing infer data'
-    if infer_flag_exists:
-      write_data(alt_infer_data,
-        output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
-        output_kb_pattern.format(FLAGS.output_prefix + '.infer.'))
-    else:
-      write_completion(
-          data, output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
-          output_data_pattern.format(FLAGS.output_prefix + '.infer.tar.'),
-          output_kb_pattern.format(FLAGS.output_prefix+ '.infer.'))
+    write_completion(
+        data, output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
+        output_data_pattern.format(FLAGS.output_prefix + '.infer.tar.'),
+        output_kb_pattern.format(FLAGS.output_prefix+ '.infer.'))
   if 'sp-train' in all_jobs:
     if FLAGS.verbose: print 'writing self play training data'
     write_self_play(

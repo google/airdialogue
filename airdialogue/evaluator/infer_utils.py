@@ -14,7 +14,7 @@
 
 """Utility for evaluating various tasks."""
 import codecs
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from airdialogue.evaluator.metrics import bleu
 from airdialogue.evaluator.metrics import rouge

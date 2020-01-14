@@ -14,7 +14,7 @@
 
 """This file contains content related parameters."""
 
-from tensorflow import gfile
+from tensorflow.compat.v1 import gfile
 
 
 class Facts(object):

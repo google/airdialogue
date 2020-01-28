@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+global FLAGS
+
+import sys
+import argparse
+from tensorflow import app
+from airdialogue.context_generator.context_generator_main import add_arguments as add_arguments_cx
+from airdialogue.prepro.prepro_main import add_arguments as add_arguments_pr
+from airdialogue.simulator.simulator_main import add_arguments as add_arguments_sim
+from airdialogue.visualizer.visualizer_main import add_arguments as add_arguments_vis
+from airdialogue.evaluator.evaluator_main import add_arguments as add_arguments_eval
+from airdialogue.generate_infer.generate_infer_main import add_arguments as add_arguments_gen
+from airdialogue.context_generator.context_generator_main import main as main_cx
+from airdialogue.prepro.prepro_main import main as main_pr
+from airdialogue.simulator.simulator_main import main as main_sim
+from airdialogue.visualizer.visualizer_main import main as main_vis
+from airdialogue.evaluator.evaluator_main import main as main_eval
+from airdialogue.generate_infer.generate_infer_main import main as main_gen
+
+if __name__ == "__main__":
+  if len(sys.argv) == 1:
+    print """Number of parameters has to be larger than one."""
+  else:
+    this_parser = argparse.ArgumentParser()
+    if sys.argv[1] == 'contextgen':
+      add_arguments_cx(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_cx(FLAGS)
+    elif sys.argv[1] == 'prepro':
+      add_arguments_pr(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_pr(FLAGS)
+    elif sys.argv[1] == 'sim':
+      add_arguments_sim(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_sim(FLAGS)
+    elif sys.argv[1] == 'vis':
+      add_arguments_vis(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_vis(FLAGS)
+    elif sys.argv[1] == 'score':
+      add_arguments_eval(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_eval(FLAGS)
+    elif sys.argv[1] == 'generate_infer':
+      add_arguments_gen(this_parser)
+      FLAGS, unparsed = this_parser.parse_known_args()
+      main_gen(FLAGS)
+    else:
+      raise ValueError('Argument not expected.')

@@ -68,7 +68,7 @@ def write_infer_json(data, kb, output_file_src, output_file_tgt
     entire_dialogue = entry['dialogue'][:]
 
     # random_turn = random.randint(0, len(start) - 1)
-    for target_turn in range(len(entire_dialogue)):
+    for target_turn in range(len(entire_dialogue))[1:]:
       f_kb.write(json_dump(entry_kb) + '\n')
       entry['dialogue'] = entire_dialogue[0:target_turn]
       f_src.write(json_dump(entry) + '\n')

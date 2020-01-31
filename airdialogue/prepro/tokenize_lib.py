@@ -418,17 +418,22 @@ def write_cat(files, cats):
         f.write(str(cat) + '\n')
 
 
-def write_data(data, output_file_data, output_file_kb):
+def write_data(data, output_file_data, output_file_kb, alt_infer=False):
   """This function writes data into a text file."""
   f_data = gfile.Open(output_file_data, 'w')
   f_kb = gfile.Open(output_file_kb, 'w')
   for entry in data:
     f_kb.write(flatten_json(entry['kb']) + '\n')
-    new_arr = [
-        entry['intent'], entry['action'], entry['dialogue'],
-        entry['boundaries1']
-    ]
-    # only boundary1 is used but not 2 because it's not necessary.
+    new_arr = []
+    if alt_infer:
+      new_arr = [
+          entry['intent'], entry['dialogue'].replace("<eod> ", "")
+      ]
+    else:
+      new_arr = [
+        entry['intent'], entry['action'], entry['dialogue'], entry['boundaries1']
+      ]
+      # only boundary1 is used but not 2 because it's not necessary.
     f_data.write('|'.join(new_arr) + '\n')
   f_data.close()
   f_kb.close()

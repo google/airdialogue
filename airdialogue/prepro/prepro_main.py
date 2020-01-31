@@ -132,7 +132,7 @@ def process_job_type(job_type_str, input_type):
   return all_jobs
 
 def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
-    output_all_vab, gen_cat):
+    output_all_vab, gen_cat, cat_files):
   vocal_map = {}
   sent_tokenize = nltk.sent_tokenize
   
@@ -161,10 +161,6 @@ def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
                                frequency_cutoff, FLAGS.keep_non_ascii)
   if gen_cat:
     if FLAGS.verbose: print 'writing category'
-    cat_files = [
-        first_name_cats_file, last_name_cats_file, flight_cats_file,
-        status_cats_file
-    ]
     write_cat(cat_files, cats)
 
   if FLAGS.verbose:
@@ -213,6 +209,10 @@ def main(FLAGS):
       FLAGS.output_prefix)
   status_cats_file = output_dir + '/{0}.status.cat'.format(
       FLAGS.output_prefix)
+  cat_files = [
+      first_name_cats_file, last_name_cats_file, flight_cats_file,
+      status_cats_file
+  ]
 
   output_data_pattern = output_dir + '/{0}data'
   output_kb_pattern = output_dir + '/{0}kb'
@@ -225,12 +225,12 @@ def main(FLAGS):
   if any(j != 'infer' for j in all_jobs) or not infer_flag_exists:
     # We need to process the default json
     data = load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
-      output_all_vab, FLAGS.gen_cat)
+      output_all_vab, FLAGS.gen_cat, cat_files)
 
   if 'infer' in all_jobs and infer_flag_exists:
     # We need to process alternate infer json
     alt_infer_data = load_data_from_jsons(FLAGS, FLAGS.infer_src_data_file,
-      FLAGS.infer_kb_file, None, None, False)
+      FLAGS.infer_kb_file, None, None, False, [])
 
   if 'train' in all_jobs:
     if FLAGS.verbose:
@@ -247,12 +247,14 @@ def main(FLAGS):
     if infer_flag_exists:
       write_data(alt_infer_data,
         output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
-        output_kb_pattern.format(FLAGS.output_prefix + '.infer.'))
+        output_kb_pattern.format(FLAGS.output_prefix + '.infer.'),
+        alt_infer = True)
     else:
       write_completion(
           data, output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
           output_data_pattern.format(FLAGS.output_prefix + '.infer.tar.'),
-          output_kb_pattern.format(FLAGS.output_prefix+ '.infer.'))
+          output_kb_pattern.format(FLAGS.output_prefix+ '.infer.')
+          )
   if 'sp-train' in all_jobs:
     if FLAGS.verbose: print 'writing self play training data'
     write_self_play(

@@ -19,6 +19,7 @@ import os
 import nltk
 from tensorflow import gfile
 import tensorflow as tf
+from tqdm import tqdm
 
 from airdialogue.prepro.tokenize_lib import list_of_action_tokens_except_name
 from airdialogue.prepro.tokenize_lib import process_kb
@@ -31,7 +32,7 @@ from airdialogue.prepro.tokenize_lib import write_self_play
 from airdialogue.prepro.tokenize_lib import write_vocabulary
 # Standardization libs
 from airdialogue.prepro.standardize_data_lib import standardize_and_drop
-from airdialogue.prepro.standardize_data_lib import load_and_drop
+from airdialogue.prepro.standardize_data_lib import load_and_drop, load_and_drop_stream
 import sys
 FLAGS = None
 
@@ -170,6 +171,48 @@ def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
                          processed_kb, boundaries1, boundaries2)
   return data
 
+def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_vab,
+    output_all_vab, gen_cat, cat_files):
+  vocal_map = {}
+  sent_tokenize = nltk.sent_tokenize
+  
+  for raw_data, raw_kb in tqdm(load_and_drop_stream(
+      input_data_file,
+      input_kb_file,
+      drop_incorrect=not FLAGS.keep_incorrect,
+      verbose=FLAGS.verbose), desc="processing stream"):
+    # has to be there no matter what
+    if FLAGS.verbose: print 'processing kb'
+    processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
+    # if dialogue, everything will be there.
+    # if context, only intents, actions, vocal_map will be there
+    if FLAGS.verbose: print 'processing data'
+    result = process_main_data(
+        [raw_data],
+        sent_tokenize,
+        word_tokenize,
+        vocal_map,
+        stream=True,
+        input_type=FLAGS.input_type)
+    intents, actions, expected_actions, dialogues, vocal_map, boundaries1, boundaries2, cats = result
+    frequency_cutoff = FLAGS.word_cutoff
+    # 3 is the number of special tokens
+    # if FLAGS.verbose: print 'vocabulary before cutoff', len(vocal_map) + 3
+    # vocal_map = write_vocabulary(output_vab, output_all_vab, vocal_map,
+    #                             frequency_cutoff, FLAGS.keep_non_ascii)
+    # print("CC")
+    # print(vocal_map)
+    if gen_cat:
+      if FLAGS.verbose: print 'writing category'
+      write_cat(cat_files, cats)
+
+    if FLAGS.verbose:
+      print 'frequency_cutoff= {0}, vocabulary after cutoff'.format(
+          frequency_cutoff), len(vocal_map)
+    data = reorganize_data(intents, actions, expected_actions, dialogues,
+                          processed_kb, boundaries1, boundaries2)[0]
+    yield data
+
 def main(FLAGS):
   all_jobs = process_job_type(FLAGS.job_type, FLAGS.input_type)
   output_dir = FLAGS.output_dir
@@ -229,7 +272,7 @@ def main(FLAGS):
 
   if 'infer' in all_jobs and infer_flag_exists:
     # We need to process alternate infer json
-    alt_infer_data = load_data_from_jsons(FLAGS, FLAGS.infer_src_data_file,
+    alt_infer_data = load_data_from_jsons_stream(FLAGS, FLAGS.infer_src_data_file,
       FLAGS.infer_kb_file, None, None, False, [])
 
   if 'train' in all_jobs:

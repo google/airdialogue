@@ -70,10 +70,13 @@ def tokenize_kb(kb_json):
   return res + ' ' + ' '.join(flight_arr)
 
 
-def process_kb(raw_kb, word_map):
+def process_kb(raw_kb, word_map, stream=False):
   """main entry to process kb."""
   processed_data = []
-  for kb_object in tqdm(raw_kb, desc='process kb'):
+  d = raw_kb
+  if not stream:
+    d = tqdm(raw_kb, desc='process kb')
+  for kb_object in d:
     # the database will be flattened into a single sequence of tokens.
     flattened = tokenize_kb(kb_object)
     processed_data.append(flattened)
@@ -214,7 +217,7 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
 
 # Right now expected action is not used only one flight is considered.
 def process_main_data(raw_data, sent_tok, word_tok, word_map,
-                      input_type):
+                      input_type, stream=False):
   """This function processes the main data."""
 
   def process_dialogue(dialogue):
@@ -309,7 +312,11 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   flight_cat = set([])
   state_cat = set([])
 
-  for loaded_json in tqdm(raw_data, desc='process raw data'):
+  d = raw_data
+  if not stream:
+    d = tqdm(raw_data, desc='process raw data')
+
+  for loaded_json in d:
     # loaded_json = json.loads(delete_non_ascii(line))
     # input_type
     intent = loaded_json['intent']
@@ -360,7 +367,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
       lengths.append(length)
       word_map = apply_word_map(processed_dialogue, word_map)
 
-  if input_type == 'dialogue':  #  output stats only when input is dialogue
+  if input_type == 'dialogue' and not stream:  #  output stats only when input is dialogue
     min_length, mean_length, max_length = np.min(lengths), np.mean(
         lengths), np.max(lengths)
     print ("min_len: ${0}, mean_len: {1}, max_len: {2}"

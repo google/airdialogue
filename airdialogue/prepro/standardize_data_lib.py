@@ -92,6 +92,25 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
           len(loaded_data) * 1.0 / total_in_file)
   return loaded_data, loaded_kb
 
+def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=True):
+  """ this function filter incorrect samples without standardization.
+  """
+  fin_data = gfile.FastGFile(data_file)
+  fin_kb = gfile.FastGFile(kb_file)
+  for line1 in fin_data:
+    if len(line1.strip()) < 10:
+      continue
+    line2 = fin_kb.readline()
+    if len(line2.strip()) < 10:
+      continue
+    line1 = delete_non_ascii(line1)
+    line2 = delete_non_ascii(line2)
+
+    data_obj = json.loads(line1)
+    kb_obj = json.loads(line2)
+    if (not drop_incorrect) or (
+        'correct_sample' not in data_obj) or data_obj['correct_sample']:
+      yield data_obj, kb_obj
 
 def standardize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
   """ this function filter incorrect samples and standardize them

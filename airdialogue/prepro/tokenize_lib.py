@@ -16,7 +16,7 @@
 
 import nltk
 import numpy as np
-from tensorflow import gfile
+from tensorflow.compat.v1 import gfile
 from tqdm import tqdm
 
 

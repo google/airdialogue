@@ -16,7 +16,7 @@
 
 import argparse
 from airdialogue.context_generator import context_generator_lib
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import sys
 
 FLAGS= None

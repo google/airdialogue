@@ -16,7 +16,7 @@
 
 import argparse
 from os.path import expanduser
-from tensorflow.io import gfile
+from tensorflow.compat.v1.io import gfile
 from collections import Counter
 import numpy as np
 import json
@@ -29,7 +29,7 @@ from airdialogue.evaluator.infer_utils import evaluate as evaluate_infer
 from airdialogue.evaluator.selfplay_utils import compute_reward as compute_reward2
 
 from tqdm import tqdm
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 FLAGS = None
 

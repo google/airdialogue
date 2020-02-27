@@ -16,8 +16,8 @@
 
 import argparse
 import os
-from tensorflow import gfile
-import tensorflow as tf
+from tensorflow.compat.v1 import gfile
+import tensorflow.compat.v1 as tf
 
 from airdialogue.prepro.tokenize_lib import list_of_action_tokens_except_name
 from airdialogue.prepro.tokenize_lib import flatten_json

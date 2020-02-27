@@ -16,8 +16,8 @@
 
 import argparse
 import json
-from tensorflow import gfile as gfile
-import tensorflow as tf
+from tensorflow.compat.v1 import gfile as gfile
+import tensorflow.compat.v1 as tf
 import sys
 
 from airdialogue.context_generator import context_generator_lib

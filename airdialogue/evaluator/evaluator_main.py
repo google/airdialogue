@@ -18,6 +18,7 @@ import argparse
 from os.path import expanduser
 from tensorflow.io import gfile
 from collections import Counter
+import nltk
 import numpy as np
 import json
 import sys
@@ -25,6 +26,7 @@ import sys
 from airdialogue.prepro.tokenize_lib import tokenize_kb
 
 from airdialogue.evaluator.metrics.f1 import f1_score
+from airdialogue.evaluator.metrics.bleu import compute_bleu
 from airdialogue.evaluator.infer_utils import evaluate as evaluate_infer
 from airdialogue.evaluator.selfplay_utils import compute_reward as compute_reward2
 
@@ -212,26 +214,53 @@ def score_inference(flags):
   print 'infer bleu: ', infer_bleu
   return {'bleu': infer_bleu}
 
+def action_obj_to_str(o):
+  fl = 'empty'
+  if o['flight']:
+    fl = str(o['flight'][0])
+  return ' '.join([o['name'], "<fl_" + fl + ">", "<st_" + o['status'] + ">"])
+
+def json_obj_to_tokens(o):
+  d = o["dialogue"]
+  decapped = map(lambda s: " ".join(s.split(":")[1:]).strip(), d)
+  one_string = " ".join(decapped)
+  tokenized = nltk.word_tokenize(one_string)
+  return tokenized
 
 def score_selfplay(flags):
   assert flags.true_data and flags.true_kb and flags.pred_data
   # check output
 
   all_score = []
+  bleu_scores = []
   with tf.gfile.GFile(flags.pred_data) as f:
-    for line in f:
-      json_obj = json.loads(line)
-      intent = json_obj['intent']
-      pred_action = json_obj['pred_action'].split(' ')
-      true_action = json_obj['action'].split(' ')
-      utterance = json_obj['utterance']
-      kb = json_obj['kb']
-      score = compute_reward2(pred_action, true_action, kb)
-      all_score.append(score)
-  avg_score = np.mean(score)
-  print "score=", avg_score
+    with tf.gfile.GFile(flags.true_data) as t:
+      with tf.gfile.GFile(flags.true_kb) as kb:
+        for pred_line, true_line, kb_line in tqdm(zip(f, t, kb)):
+          pred_json_obj = json.loads(pred_line)
+          true_json_obj = json.loads(true_line)
+          kb = tokenize_kb(json.loads(kb_line))
+          pred_action = ""
+          if 'action' in pred_json_obj:
+            pred_action = "<unk> <unk> <unk> <unk>".split(' ')
+          else:
+            pred_action = action_obj_to_str(pred_json_obj['action']).split(' ')
+          true_action = action_obj_to_str(true_json_obj['action']).split(' ')
+          score = compute_reward2(pred_action, true_action, kb)
+          all_score.append(score)
 
-  return {"score": avg_score}
+          pred_raw_text = json_obj_to_tokens(pred_json_obj)
+          true_raw_text = json_obj_to_tokens(true_json_obj)
+
+          _b = compute_bleu([[true_raw_text]], [pred_raw_text])
+          bleu_scores.append(_b[0])
+
+  avg_score = np.mean(all_score)
+  avg_bleu = np.mean(bleu_scores)
+  print "score=", avg_score
+  print "bleu=", avg_bleu
+
+  return {"score": avg_score, "bleu": avg_bleu}
 
 
 def main(flags):

@@ -109,7 +109,7 @@ def reorganize_data(intents, actions, expected_actions, dialogues, kbs,
   code for the random split version.
   """
   data = []
-  for i in xrange(len(intents)):
+  for i in range(len(intents)):
     entry = generate_entry(intents, actions, expected_actions, dialogues, kbs,
                            boundaries1, boundaries2, i)
     data.append(entry)
@@ -143,11 +143,11 @@ def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
       drop_incorrect=not FLAGS.keep_incorrect,
       verbose=FLAGS.verbose)
   # has to be there no matter what
-  if FLAGS.verbose: print 'processing kb'
+  if FLAGS.verbose: print('processing kb')
   processed_kb, vocal_map = process_kb(raw_kb, vocal_map)
   # if dialogue, everything will be there.
   # if context, only intents, actions, vocal_map will be there
-  if FLAGS.verbose: print 'processing data'
+  if FLAGS.verbose: print('processing data')
   result = process_main_data(
       raw_data,
       sent_tokenize,
@@ -157,16 +157,16 @@ def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
   intents, actions, expected_actions, dialogues, vocal_map, boundaries1, boundaries2, cats = result
   frequency_cutoff = FLAGS.word_cutoff
   # 3 is the number of special tokens
-  if FLAGS.verbose: print 'vocabulary before cutoff', len(vocal_map) + 3
+  if FLAGS.verbose: print('vocabulary before cutoff', len(vocal_map) + 3)
   vocal_map = write_vocabulary(output_vab, output_all_vab, vocal_map,
                                frequency_cutoff, FLAGS.keep_non_ascii)
   if gen_cat:
-    if FLAGS.verbose: print 'writing category'
+    if FLAGS.verbose: print('writing category')
     write_cat(cat_files, cats)
 
   if FLAGS.verbose:
-    print 'frequency_cutoff= {0}, vocabulary after cutoff'.format(
-        frequency_cutoff), len(vocal_map)
+    print('frequency_cutoff= {0}, vocabulary after cutoff'.format(
+        frequency_cutoff), len(vocal_map))
   data = reorganize_data(intents, actions, expected_actions, dialogues,
                          processed_kb, boundaries1, boundaries2)
   return data
@@ -182,11 +182,11 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
       drop_incorrect=not FLAGS.keep_incorrect,
       verbose=FLAGS.verbose), desc="processing stream"):
     # has to be there no matter what
-    if FLAGS.verbose: print 'processing kb'
+    if FLAGS.verbose: print('processing kb')
     processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
     # if dialogue, everything will be there.
     # if context, only intents, actions, vocal_map will be there
-    if FLAGS.verbose: print 'processing data'
+    if FLAGS.verbose: print('processing data')
     result = process_main_data(
         [raw_data],
         sent_tokenize,
@@ -203,12 +203,12 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
     # print("CC")
     # print(vocal_map)
     if gen_cat:
-      if FLAGS.verbose: print 'writing category'
+      if FLAGS.verbose: print('writing category')
       write_cat(cat_files, cats)
 
     if FLAGS.verbose:
-      print 'frequency_cutoff= {0}, vocabulary after cutoff'.format(
-          frequency_cutoff), len(vocal_map)
+      print('frequency_cutoff= {0}, vocabulary after cutoff'.format(
+          frequency_cutoff), len(vocal_map))
     data = reorganize_data(intents, actions, expected_actions, dialogues,
                           processed_kb, boundaries1, boundaries2)[0]
     yield data
@@ -217,18 +217,18 @@ def main(FLAGS):
   all_jobs = process_job_type(FLAGS.job_type, FLAGS.input_type)
   output_dir = FLAGS.output_dir
   if FLAGS.verbose:
-    print 'all_jobs', all_jobs
-    print 'input_type', FLAGS.input_type
-    print 'output_dir', output_dir
-    print 'data_file', FLAGS.data_file
-    print 'kb_file', FLAGS.kb_file
-    print 'output_prefix', FLAGS.output_prefix
-    print 'skip_standardize', FLAGS.skip_standardize
-    print 'keep_incorrect', FLAGS.keep_incorrect
-    print 'word_cutoff', FLAGS.word_cutoff
-    print 'gen_voc', FLAGS.gen_voc
-    print 'infer_src_data_file', FLAGS.infer_src_data_file
-    print 'infer_kb_file', FLAGS.infer_kb_file
+    print('all_jobs', all_jobs)
+    print('input_type', FLAGS.input_type)
+    print('output_dir', output_dir)
+    print('data_file', FLAGS.data_file)
+    print('kb_file', FLAGS.kb_file)
+    print('output_prefix', FLAGS.output_prefix)
+    print('skip_standardize', FLAGS.skip_standardize)
+    print('keep_incorrect', FLAGS.keep_incorrect)
+    print('word_cutoff', FLAGS.word_cutoff)
+    print('gen_voc', FLAGS.gen_voc)
+    print('infer_src_data_file', FLAGS.infer_src_data_file)
+    print('infer_kb_file', FLAGS.infer_kb_file)
 
   if not tf.io.gfile.isdir(output_dir):
     gfile.MkDir(output_dir)
@@ -277,16 +277,16 @@ def main(FLAGS):
 
   if 'train' in all_jobs:
     if FLAGS.verbose:
-      print 'writing train data'
+      print('writing train data')
     write_data(data, output_data_pattern.format(FLAGS.output_prefix + '.'),
                output_kb_pattern.format(FLAGS.output_prefix + '.'))
   if 'eval' in all_jobs:
     if FLAGS.verbose:
-      print 'writing eval data'
+      print('writing eval data')
     write_data(data, output_data_pattern.format(FLAGS.output_prefix + '.eval.'),
                output_kb_pattern.format(FLAGS.output_prefix + '.eval.'))
   if 'infer' in all_jobs:
-    if FLAGS.verbose: print 'writing infer data'
+    if FLAGS.verbose: print('writing infer data')
     if infer_flag_exists:
       write_data(alt_infer_data,
         output_data_pattern.format(FLAGS.output_prefix + '.infer.src.'),
@@ -299,13 +299,13 @@ def main(FLAGS):
           output_kb_pattern.format(FLAGS.output_prefix+ '.infer.')
           )
   if 'sp-train' in all_jobs:
-    if FLAGS.verbose: print 'writing self play training data'
+    if FLAGS.verbose: print('writing self play training data')
     write_self_play(
         data,
         output_data_pattern.format(FLAGS.output_prefix + '.selfplay.'),
         output_kb_pattern.format(FLAGS.output_prefix + '.selfplay.'))
   if 'sp-eval' in all_jobs:
-    if FLAGS.verbose: print 'writing self play eval data'
+    if FLAGS.verbose: print('writing self play eval data')
     write_self_play(
         data,
         output_data_pattern.format(FLAGS.output_prefix + '.selfplay.eval.'),

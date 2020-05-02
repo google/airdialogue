@@ -165,7 +165,7 @@ def standardize_intent(org_intent):
   """
   new_intent = {}
   for key in org_intent:
-    if key in [u'departure_date', u'return_date']:
+    if key in ['departure_date', 'return_date']:
       continue
     if org_intent[key] == 'all':
       continue

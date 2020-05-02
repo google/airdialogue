@@ -82,10 +82,10 @@ def write_infer_json(data, kb, output_file_src, output_file_tgt
 def main(FLAGS):
   output_dir = FLAGS.output_dir
   if FLAGS.verbose:
-    print 'output_dir', output_dir
-    print 'data_file', FLAGS.data_file
-    print 'kb_file', FLAGS.kb_file
-    print 'output_prefix', FLAGS.output_prefix
+    print('output_dir', output_dir)
+    print('data_file', FLAGS.data_file)
+    print('kb_file', FLAGS.kb_file)
+    print('output_prefix', FLAGS.output_prefix)
 
   if not tf.io.gfile.isdir(output_dir):
     gfile.MkDir(output_dir)

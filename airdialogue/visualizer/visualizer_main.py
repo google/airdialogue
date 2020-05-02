@@ -62,7 +62,7 @@ def wrapper(FLAGS):
     partition = request.form.get("partition")
 
     if not partitions:
-      print "no data is found in the directory"
+      print("no data is found in the directory")
       return """No partitions found under {0}. Supported partitions has to end
                 with .json extension.""".format(FLAGS.data_path)
     if not partition:
@@ -84,7 +84,7 @@ def wrapper(FLAGS):
       return "Invalid index."
 
     if (not line_data) and (not line_kb):
-      print "invalid partition number."
+      print("invalid partition number.")
     data_object = json.loads(line_data)
     kb_object = json.loads(line_kb)
     html_source = generate_html(data_object, kb_object, index, partitions,

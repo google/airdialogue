@@ -59,7 +59,7 @@ def standardize_message(utterances, time_stamp=None):
 
 
 def delete_non_ascii(s):
-  return filter(lambda x: x in printable, s)
+  return "".join([x for x in s if x in printable])
 
 
 def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
@@ -88,8 +88,8 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
     total_in_file += 1
 
   if verbose:
-    print('loaded: ', len(loaded_data), '/', total_in_file, '=',
-          len(loaded_data) * 1.0 / total_in_file)
+    print(('loaded: ', len(loaded_data), '/', total_in_file, '=',
+          len(loaded_data) * 1.0 / total_in_file))
   return loaded_data, loaded_kb
 
 def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=True):

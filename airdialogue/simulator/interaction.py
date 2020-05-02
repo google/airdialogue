@@ -307,7 +307,7 @@ class Interaction(object):
       error = erro_state
     else:
       if self.random_respond_error:
-        error_to_handle = utils.choice(range(len(erro_state)))
+        error_to_handle = utils.choice(list(range(len(erro_state))))
       else:
         error_to_handle = 0
       error = erro_state[error_to_handle]

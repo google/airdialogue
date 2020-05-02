@@ -91,9 +91,9 @@ def distance_calculator(flight1, flight2, debug=False):  # flight2 is benchmark
           upper = numerical_upper[i]
         else:
           upper = None
-        print i, num_a, num_b, upper
+        print(i, num_a, num_b, upper)
   if debug:
-    print values
+    print(values)
   return sum(values) / 12.0  # there are 12 elements
 
 

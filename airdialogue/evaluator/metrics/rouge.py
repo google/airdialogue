@@ -19,10 +19,10 @@ This is a modified and slightly extended verison of
 https://github.com/miso-belica/sumy/blob/dev/sumy/evaluation/rouge.py.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+
+
+
+
 
 import itertools
 import numpy as np
@@ -131,7 +131,7 @@ def _recon_lcs(x, y):
     else:
       return _recon(i, j - 1)
 
-  recon_tuple = tuple(map(lambda x: x[0], _recon(i, j)))
+  recon_tuple = tuple([x[0] for x in _recon(i, j)])
   return recon_tuple
 
 
@@ -335,20 +335,20 @@ def rouge(hypotheses, references):
   rouge_1 = [
       rouge_n([hyp], [ref], 1) for hyp, ref in zip(hypotheses, references)
   ]
-  rouge_1_f, rouge_1_p, rouge_1_r = map(np.mean, zip(*rouge_1))
+  rouge_1_f, rouge_1_p, rouge_1_r = list(map(np.mean, list(zip(*rouge_1))))
 
   # Calculate ROUGE-2 F1, precision, recall scores
   rouge_2 = [
       rouge_n([hyp], [ref], 2) for hyp, ref in zip(hypotheses, references)
   ]
-  rouge_2_f, rouge_2_p, rouge_2_r = map(np.mean, zip(*rouge_2))
+  rouge_2_f, rouge_2_p, rouge_2_r = list(map(np.mean, list(zip(*rouge_2))))
 
   # Calculate ROUGE-L F1, precision, recall scores
   rouge_l = [
       rouge_l_sentence_level([hyp], [ref])
       for hyp, ref in zip(hypotheses, references)
   ]
-  rouge_l_f, rouge_l_p, rouge_l_r = map(np.mean, zip(*rouge_l))
+  rouge_l_f, rouge_l_p, rouge_l_r = list(map(np.mean, list(zip(*rouge_l))))
 
   return {
       "rouge_1/f_score": rouge_1_f,

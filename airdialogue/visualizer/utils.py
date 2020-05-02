@@ -21,7 +21,7 @@ def generate_kv_nested_html(nested_kv, space):
   """This function generates html for nested key-value pair structures."""
   code = """<table style="width:{0}">\n""".format(space)
   for element in nested_kv:
-    sorted_list = sorted(element.items(), key=lambda a: a[0])
+    sorted_list = sorted(list(element.items()), key=lambda a: a[0])
     code = code + """
     <tr>
     """
@@ -38,15 +38,15 @@ def format_simple_string(kv):
   """This function format a simple key-varlue pair.
   It also highlight some of the fields in intent.
   """
-  sorted_list = sorted(kv.items(), key=lambda a: a[0])
+  sorted_list = sorted(list(kv.items()), key=lambda a: a[0])
   arr = []
   for el in sorted_list:
-    key = unicode(el[0])
+    key = str(el[0])
     if key in ['return_time', 'departure_time']:
       key = """<font style="color: #fff; background-color: red">""" + key + """</font>"""
     if key == 'airline_preference':
       key = """<font style="color: #fff; background-color: blue">""" + key + """</font>"""
-    arr.append((key + ':' + unicode(el[1])))
+    arr.append((key + ':' + str(el[1])))
   return ', '.join(arr)
 
 
@@ -95,7 +95,7 @@ def generate_html(sample,
   # print ('reservation', reservation)
   if 'search_info' in sample:
     search_info = sample['search_info']
-    if type(search_info) == unicode:
+    if type(search_info) == str:
       search_info = json.loads(search_info)
   else:
     search_info = None
@@ -119,7 +119,7 @@ def generate_html(sample,
   html_code += generate_form(partitions, sid, partition)
   html_code += """<h2>AirDialogue No. {0} on partition {1}. </h2>\n
   """.format(sid, partition)
-  html_code = unicode(html_code)
+  html_code = str(html_code)
   html_code += """<table style="width:100%">"""
   html_code += """<tr> {0}</tr>""".format(
       '<strong>intent:</strong>' + intent_table.encode('ascii', 'ignore') +

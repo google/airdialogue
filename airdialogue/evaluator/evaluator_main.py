@@ -203,7 +203,7 @@ def score_human_data(flags):
   sn = np.array(scores)
   # np.mean(sn[:,0]), np.mean(sn[:,1]),np.mean(sn[:,2]),np.mean(sn[:,3])
   score = np.mean(sn[:, 0])
-  print 'final score',score
+  print('final score',score)
   return {'score': score}
 
 def score_inference(flags):
@@ -211,7 +211,7 @@ def score_inference(flags):
   expanded_true_data = expanduser(flags.true_data)
   expanded_pred_data = expanduser(flags.pred_data)
   infer_bleu = evaluate_infer(expanded_true_data, expanded_pred_data, 'bleu')
-  print 'infer bleu: ', infer_bleu
+  print('infer bleu: ', infer_bleu)
   return {'bleu': infer_bleu}
 
 def action_obj_to_str(o):
@@ -222,7 +222,7 @@ def action_obj_to_str(o):
 
 def json_obj_to_tokens(o):
   d = o["dialogue"]
-  decapped = map(lambda s: " ".join(s.split(":")[1:]).strip(), d)
+  decapped = [" ".join(s.split(":")[1:]).strip() for s in d]
   one_string = " ".join(decapped)
   tokenized = nltk.word_tokenize(one_string)
   return tokenized
@@ -236,7 +236,7 @@ def score_selfplay(flags):
   with tf.gfile.GFile(flags.pred_data) as f:
     with tf.gfile.GFile(flags.true_data) as t:
       with tf.gfile.GFile(flags.true_kb) as kb:
-        for pred_line, true_line, kb_line in tqdm(zip(f, t, kb)):
+        for pred_line, true_line, kb_line in tqdm(list(zip(f, t, kb))):
           pred_json_obj = json.loads(pred_line)
           true_json_obj = json.loads(true_line)
           kb = tokenize_kb(json.loads(kb_line))
@@ -257,8 +257,8 @@ def score_selfplay(flags):
 
   avg_score = np.mean(all_score)
   avg_bleu = np.mean(bleu_scores)
-  print "score=", avg_score
-  print "bleu=", avg_bleu
+  print("score=", avg_score)
+  print("bleu=", avg_bleu)
 
   return {"score": avg_score, "bleu": avg_bleu}
 

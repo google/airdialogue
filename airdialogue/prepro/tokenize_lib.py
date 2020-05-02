@@ -86,7 +86,7 @@ def process_kb(raw_kb, word_map, stream=False):
 
 def flatten_json(obj):
   if isinstance(obj, dict):
-    new_list = sorted(obj.items(), key=lambda a: a[0])
+    new_list = sorted(list(obj.items()), key=lambda a: a[0])
     res_list = []
     for key, value in new_list:
       new_val = flatten_json(value)
@@ -188,7 +188,7 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
     else:
       nm1, nm2 = name_arr
   except:
-    print 'name', action_json['name']
+    print('name', action_json['name'])
   fl_arr = action_json['flight']
   if len(fl_arr) == 0:
     fl = 'empty'
@@ -258,7 +258,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
     """This function gets the boundary array of the dialogues."""
 
     def get_end_token(start, set_of_end_tokens, splitted_dialogues):
-      for i in xrange(start, len(splitted_dialogues)):
+      for i in range(start, len(splitted_dialogues)):
         if splitted_dialogues[i] in set_of_end_tokens:
           return i
       assert False, 'end token not found : ' + ' '.join(
@@ -266,7 +266,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
               len(splitted_dialogues))
 
     def get_next_start_token(end_position, start_token, splitted_dialogues):
-      for i in xrange(end_position, len(splitted_dialogues)):
+      for i in range(end_position, len(splitted_dialogues)):
         if splitted_dialogues[i] == start_token:
           return i
       return len(splitted_dialogues)
@@ -370,9 +370,9 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   if input_type == 'dialogue' and not stream:  #  output stats only when input is dialogue
     min_length, mean_length, max_length = np.min(lengths), np.mean(
         lengths), np.max(lengths)
-    print ("min_len: ${0}, mean_len: {1}, max_len: {2}"
+    print(("min_len: ${0}, mean_len: {1}, max_len: {2}"
           "max_sent_len: {3}, max_turn: {4}").format(min_length, mean_length,
-          max_length, max_diag_length, max_turn1)
+          max_length, max_diag_length, max_turn1))
 
   # return all the processed data. Some of them will be empty arrays when in
   # context mode.
@@ -456,8 +456,8 @@ def write_completion(data, output_file_data_src, output_file_data_tar,
   for entry in data:
     bd1 = entry['boundaries1'].split(' ')
     bd2 = entry['boundaries2'].split(' ')
-    start = bd1[0:len(bd1) / 2] + bd2[0:len(bd2) / 2]
-    end = bd1[len(bd1) / 2:] + bd2[len(bd2) / 2:]
+    start = bd1[0:len(bd1) // 2] + bd2[0:len(bd2) // 2]
+    end = bd1[len(bd1) // 2:] + bd2[len(bd2) // 2:]
     # random_turn = random.randint(0, len(start) - 1)
     for random_turn in range(len(start)):
       f_kb.write(flatten_json(entry['kb']) + '\n')

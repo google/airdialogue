@@ -470,7 +470,7 @@ def write_completion(data, output_file_data_src, output_file_data_tar,
       dialogue_tar = dialogue_split[turn_start + 1:turn_end + 1]
       src_arr = [entry['intent'], ' '.join(dialogue_src)]
       f_data_src.write('|'.join(src_arr) + '\n')
-      tar_arr = [' '.join(dialogue_tar)]
+      tar_arr = [entry['action'], ' '.join(dialogue_tar)]
       f_data_tar.write('|'.join(tar_arr) + '\n')
 
   f_data_src.close()

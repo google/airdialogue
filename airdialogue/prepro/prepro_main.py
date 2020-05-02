@@ -58,6 +58,12 @@ def add_arguments(parser):
   parser.add_argument('--verbose', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, debug info will be printed out.')
+  parser.add_argument('--skip_standardize', type='bool', nargs='?', const=True,
+                      default=False,
+                      help='''if enabled, dialogues will skip the
+                              standardization process, which includes
+                              removeing duplicated end of sentence tokens and
+                              filtering out non-ascii characters.''')
   parser.add_argument('--keep_incorrect', type='bool', nargs='?', const=True,
                       default=False,
                       help='''if enabled, incorrect dialogues will not be
@@ -78,10 +84,6 @@ def add_arguments(parser):
   parser.add_argument('--keep_non_ascii', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, non-ascii tokens will not be droped in vocabulary')
-  parser.add_argument('--infer_src_data_file', type=str, default=None,
-                      help='path for infer_src_data_file')
-  parser.add_argument('--infer_kb_file', type=str, default=None,
-                      help='path for infer_kb_file')
 
 
 def generate_entry(intents, actions, expected_actions, dialogues, kbs,
@@ -260,8 +262,9 @@ def main(FLAGS):
   output_data_pattern = output_dir + '/{0}data'
   output_kb_pattern = output_dir + '/{0}kb'
 
-  nltk_path = FLAGS.nltk_data
+  nltk_path = FLAGS.ntlk_data
   nltk.data.path.append(nltk_path)
+  sent_tokenize = nltk.sent_tokenize
 
   infer_flag_exists = FLAGS.infer_src_data_file and FLAGS.infer_kb_file
 
@@ -274,7 +277,6 @@ def main(FLAGS):
     # We need to process alternate infer json
     alt_infer_data = load_data_from_jsons_stream(FLAGS, FLAGS.infer_src_data_file,
       FLAGS.infer_kb_file, None, None, False, [])
-
   if 'train' in all_jobs:
     if FLAGS.verbose:
       print('writing train data')

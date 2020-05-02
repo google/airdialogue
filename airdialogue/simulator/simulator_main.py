@@ -106,7 +106,7 @@ def main(FLAGS):
       standarlized_intent = utils.standardize_intent(cus.get_json())
       standarlized_action = utils.standardize_action(action)
       standarlized_expected_action = utils.standardize_action(expected_action)
-      # synthesized data is 100% correct. However, action contains at most one
+      # syntherized data is 100% correct. However, action contains at most one
       # flight. expected_action may contain more than one flight.
       f_data.write(
           json.dumps({"intent": standarlized_intent,"dialogue": utterance,

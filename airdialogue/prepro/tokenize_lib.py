@@ -70,10 +70,13 @@ def tokenize_kb(kb_json):
   return res + ' ' + ' '.join(flight_arr)
 
 
-def process_kb(raw_kb, word_map):
+def process_kb(raw_kb, word_map, stream=False):
   """main entry to process kb."""
   processed_data = []
-  for kb_object in tqdm(raw_kb, desc='process kb'):
+  d = raw_kb
+  if not stream:
+    d = tqdm(raw_kb, desc='process kb')
+  for kb_object in d:
     # the database will be flattened into a single sequence of tokens.
     flattened = tokenize_kb(kb_object)
     processed_data.append(flattened)
@@ -83,7 +86,7 @@ def process_kb(raw_kb, word_map):
 
 def flatten_json(obj):
   if isinstance(obj, dict):
-    new_list = sorted(obj.items(), key=lambda a: a[0])
+    new_list = sorted(list(obj.items()), key=lambda a: a[0])
     res_list = []
     for key, value in new_list:
       new_val = flatten_json(value)
@@ -185,7 +188,7 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
     else:
       nm1, nm2 = name_arr
   except:
-    print 'name', action_json['name']
+    print('name', action_json['name'])
   fl_arr = action_json['flight']
   if len(fl_arr) == 0:
     fl = 'empty'
@@ -214,7 +217,7 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
 
 # Right now expected action is not used only one flight is considered.
 def process_main_data(raw_data, sent_tok, word_tok, word_map,
-                      input_type):
+                      input_type, stream=False):
   """This function processes the main data."""
 
   def process_dialogue(dialogue):
@@ -255,7 +258,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
     """This function gets the boundary array of the dialogues."""
 
     def get_end_token(start, set_of_end_tokens, splitted_dialogues):
-      for i in xrange(start, len(splitted_dialogues)):
+      for i in range(start, len(splitted_dialogues)):
         if splitted_dialogues[i] in set_of_end_tokens:
           return i
       assert False, 'end token not found : ' + ' '.join(
@@ -263,7 +266,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
               len(splitted_dialogues))
 
     def get_next_start_token(end_position, start_token, splitted_dialogues):
-      for i in xrange(end_position, len(splitted_dialogues)):
+      for i in range(end_position, len(splitted_dialogues)):
         if splitted_dialogues[i] == start_token:
           return i
       return len(splitted_dialogues)
@@ -309,7 +312,11 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   flight_cat = set([])
   state_cat = set([])
 
-  for loaded_json in tqdm(raw_data, desc='process raw data'):
+  d = raw_data
+  if not stream:
+    d = tqdm(raw_data, desc='process raw data')
+
+  for loaded_json in d:
     # loaded_json = json.loads(delete_non_ascii(line))
     # input_type
     intent = loaded_json['intent']
@@ -360,12 +367,12 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
       lengths.append(length)
       word_map = apply_word_map(processed_dialogue, word_map)
 
-  if input_type == 'dialogue':  #  output stats only when input is dialogue
+  if input_type == 'dialogue' and not stream:  #  output stats only when input is dialogue
     min_length, mean_length, max_length = np.min(lengths), np.mean(
         lengths), np.max(lengths)
-    print ("min_len: ${0}, mean_len: {1}, max_len: {2}"
+    print(("min_len: ${0}, mean_len: {1}, max_len: {2}"
           "max_sent_len: {3}, max_turn: {4}").format(min_length, mean_length,
-          max_length, max_diag_length, max_turn1)
+          max_length, max_diag_length, max_turn1))
 
   # return all the processed data. Some of them will be empty arrays when in
   # context mode.
@@ -418,17 +425,22 @@ def write_cat(files, cats):
         f.write(str(cat) + '\n')
 
 
-def write_data(data, output_file_data, output_file_kb):
+def write_data(data, output_file_data, output_file_kb, alt_infer=False):
   """This function writes data into a text file."""
   f_data = gfile.Open(output_file_data, 'w')
   f_kb = gfile.Open(output_file_kb, 'w')
   for entry in data:
     f_kb.write(flatten_json(entry['kb']) + '\n')
-    new_arr = [
-        entry['intent'], entry['action'], entry['dialogue'],
-        entry['boundaries1']
-    ]
-    # only boundary1 is used but not 2 because it's not necessary.
+    new_arr = []
+    if alt_infer:
+      new_arr = [
+          entry['intent'], entry['dialogue'].replace("<eod> ", "")
+      ]
+    else:
+      new_arr = [
+        entry['intent'], entry['action'], entry['dialogue'], entry['boundaries1']
+      ]
+      # only boundary1 is used but not 2 because it's not necessary.
     f_data.write('|'.join(new_arr) + '\n')
   f_data.close()
   f_kb.close()
@@ -444,8 +456,8 @@ def write_completion(data, output_file_data_src, output_file_data_tar,
   for entry in data:
     bd1 = entry['boundaries1'].split(' ')
     bd2 = entry['boundaries2'].split(' ')
-    start = bd1[0:len(bd1) / 2] + bd2[0:len(bd2) / 2]
-    end = bd1[len(bd1) / 2:] + bd2[len(bd2) / 2:]
+    start = bd1[0:len(bd1) // 2] + bd2[0:len(bd2) // 2]
+    end = bd1[len(bd1) // 2:] + bd2[len(bd2) // 2:]
     # random_turn = random.randint(0, len(start) - 1)
     for random_turn in range(len(start)):
       f_kb.write(flatten_json(entry['kb']) + '\n')

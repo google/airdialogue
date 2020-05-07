@@ -20,7 +20,7 @@ from airdialogue.generate_infer.generate_infer_main import main as main_gen
 
 if __name__ == "__main__":
   if len(sys.argv) == 1:
-    print """Number of parameters has to be larger than one."""
+    print("""Number of parameters has to be larger than one.""")
   else:
     this_parser = argparse.ArgumentParser()
     if sys.argv[1] == 'contextgen':

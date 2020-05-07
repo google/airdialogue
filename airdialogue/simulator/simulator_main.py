@@ -74,9 +74,9 @@ def add_arguments(parser):
 
 def main(FLAGS):
   if FLAGS.verbose:
-    print "Number of samples to generate: ", FLAGS.num_samples
-    print "Output_kb: ", FLAGS.output_kb
-    print "Output_data: ", FLAGS.output_data
+    print("Number of samples to generate: ", FLAGS.num_samples)
+    print("Output_kb: ", FLAGS.output_kb)
+    print("Output_data: ", FLAGS.output_data)
 
   num_samples = FLAGS.num_samples
   cg = context_generator_lib.ContextGenerator(
@@ -99,7 +99,7 @@ def main(FLAGS):
                   "w") as f_data, gfile.Open(FLAGS.output_kb, "w") as f_kb:
     for i in range(len(ct)):
       if FLAGS.verbose and i % 5000 == 0:
-        print(i, "/", len(ct))
+        print((i, "/", len(ct)))
       cus, kb, expected_action = ct[i]
       # action has been standarlized in inter
       utterance, action, _ = inter.generate_dialogue(cus, kb)

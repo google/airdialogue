@@ -91,9 +91,9 @@ def distance_calculator(flight1, flight2, debug=False):  # flight2 is benchmark
           upper = numerical_upper[i]
         else:
           upper = None
-        print i, num_a, num_b, upper
+        print(i, num_a, num_b, upper)
   if debug:
-    print values
+    print(values)
   return sum(values) / 12.0  # there are 12 elements
 
 
@@ -116,7 +116,7 @@ def split_flight(actual_flight_concat):
 
 
 def split_db(flight_db):
-  # the first one is has reervation object
+  # the first one is has reservation object
   splitted = np.array(flight_db.split(' ')[1:])
   flight_db_arr = np.reshape(splitted, [-1, 13])
   return flight_db_arr
@@ -125,7 +125,7 @@ def split_db(flight_db):
 def generate_scaled_flight(pred_idx, truth_idx_concat, db_concat):
   """generate the scaled score between two flights based on a flight distance measure.
   """
-  # the first one is has reervation object
+  # the first one is has reservation object
   db_content = split_db(db_concat)
   all_idx = db_content[:, -1]
   # get flight arr
@@ -152,5 +152,7 @@ def generate_scaled_flight(pred_idx, truth_idx_concat, db_concat):
           flight_dist.append(score)
           if fi == pred_idx:
             pred_dist.append(score)
-
+    if not pred_dist:
+      # predicted flight not in KB
+      return 1
     return min(1, min(pred_dist) * 1.0 / max(flight_dist))

@@ -91,7 +91,7 @@ def main(FLAGS):
                                  output_kb=FLAGS.output_kb,
                                  display_freq=FLAGS.display_freq,
                                  verbose=FLAGS.verbose)
-  if FLAGS.verbose: print stats
+  if FLAGS.verbose: print(stats)
 
 
 def run_main(unused):

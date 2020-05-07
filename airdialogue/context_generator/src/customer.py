@@ -15,7 +15,7 @@
 """This file contains the structure to model customers."""
 # import ast
 import random
-import utils
+from . import utils
 
 
 class Customer(object):
@@ -42,7 +42,7 @@ class Customer(object):
     len_first_name = len(facts_obj.first_name_list)
     len_last_name = len(facts_obj.last_name_list)
     # '_' will later be replaced in intent standalization
-    for _ in xrange(num_passengers):
+    for _ in range(num_passengers):
       self.passengers.append(
           facts_obj.first_name_list[random.randint(0, len_first_name - 1)] +
           '_' + facts_obj.last_name_list[random.randint(0, len_last_name - 1)])

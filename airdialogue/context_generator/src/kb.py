@@ -15,7 +15,7 @@
 """This file defines the behavior of agents."""
 import random
 import numpy as np
-import utils
+from . import utils
 
 
 class AirFare(object):
@@ -67,7 +67,7 @@ class AirFare(object):
 
     # 7. airline
     airline_ind = random.randint(0, len(fact_obj.airline_list) - 1)
-    self.airline = fact_obj.airline_list.keys()[airline_ind]
+    self.airline = list(fact_obj.airline_list.keys())[airline_ind]
 
     # post process
     self.departure_month, self.departure_day = utils.get_month_and_day(
@@ -103,7 +103,7 @@ class Knowledgebase(object):
                return_date):
     self.knowledgebase = []
     base_flight_num = 1000
-    for i in xrange(num_flights):
+    for i in range(num_flights):
       self.knowledgebase.append(
           AirFare(fact_obj, airport_list, base_flight_num + i, departure_date,
                   return_date))

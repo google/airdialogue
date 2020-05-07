@@ -14,8 +14,8 @@
 
 """This is the entry of the flight simulator generator."""
 
-from __future__ import absolute_import
-from __future__ import division
+
+
 import copy
 import json
 import random
@@ -72,7 +72,7 @@ class ContextGenerator(object):
               replace=False))
       if display_freq:
         if verbose and n % display_freq == 0:
-          print(n, "/", num_context)
+          print((n, "/", num_context))
       cus = customer.Customer(self.fact_obj, self.book_window,
                               airport_candidate)
       ref_departure_date, ref_return_date = cus.departure_date, cus.return_date

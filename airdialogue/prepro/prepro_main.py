@@ -84,6 +84,10 @@ def add_arguments(parser):
   parser.add_argument('--keep_non_ascii', type='bool', nargs='?', const=True,
                       default=False,
                       help='if enabled, non-ascii tokens will not be droped in vocabulary')
+  parser.add_argument('--infer_src_data_file', type=str, default=None,
+                      help='path for infer_src_data_file')
+  parser.add_argument('--infer_kb_file', type=str, default=None,
+                      help='path for infer_kb_file')
 
 
 def generate_entry(intents, actions, expected_actions, dialogues, kbs,
@@ -262,7 +266,7 @@ def main(FLAGS):
   output_data_pattern = output_dir + '/{0}data'
   output_kb_pattern = output_dir + '/{0}kb'
 
-  nltk_path = FLAGS.ntlk_data
+  nltk_path = FLAGS.nltk_data
   nltk.data.path.append(nltk_path)
   sent_tokenize = nltk.sent_tokenize
 

@@ -95,8 +95,10 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=False):
 def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=False):
   """ this function filter incorrect samples without standardization.
   """
+  if verbose: print("loading stream")
   fin_data = gfile.GFile(data_file)
   fin_kb = gfile.GFile(kb_file)
+  if verbose: print("gfile loaded: ", fin_data)
   for line1 in fin_data:
     if verbose: print(line1)
     if len(line1.strip()) < 10:

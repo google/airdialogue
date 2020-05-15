@@ -188,11 +188,9 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
       drop_incorrect=not FLAGS.keep_incorrect,
       verbose=FLAGS.verbose), desc="processing stream"):
     # has to be there no matter what
-    if FLAGS.verbose: print('processing kb')
     processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
     # if dialogue, everything will be there.
     # if context, only intents, actions, vocal_map will be there
-    if FLAGS.verbose: print('processing data')
     result = process_main_data(
         [raw_data],
         sent_tokenize,

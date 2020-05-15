@@ -62,11 +62,11 @@ def delete_non_ascii(s):
   return "".join([x for x in s if x in printable])
 
 
-def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
+def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=False):
   """ this function filter incorrect samples without standardization.
   """
-  fin_data = gfile.FastGFile(data_file)
-  fin_kb = gfile.FastGFile(kb_file)
+  fin_data = gfile.GFile(data_file)
+  fin_kb = gfile.GFile(kb_file)
   total_in_file = 0
   loaded_data = []
   loaded_kb = []
@@ -92,12 +92,13 @@ def load_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
           len(loaded_data) * 1.0 / total_in_file))
   return loaded_data, loaded_kb
 
-def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=True):
+def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=False):
   """ this function filter incorrect samples without standardization.
   """
-  fin_data = gfile.FastGFile(data_file)
-  fin_kb = gfile.FastGFile(kb_file)
+  fin_data = gfile.GFile(data_file)
+  fin_kb = gfile.GFile(kb_file)
   for line1 in fin_data:
+    if verbose: print(line1)
     if len(line1.strip()) < 10:
       continue
     line2 = fin_kb.readline()
@@ -112,7 +113,7 @@ def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=True):
         'correct_sample' not in data_obj) or data_obj['correct_sample']:
       yield data_obj, kb_obj
 
-def standardize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=True):
+def standardize_and_drop(data_file, kb_file, drop_incorrect=True, verbose=False):
   """ this function filter incorrect samples and standardize them
    the same time.
   """

@@ -16,7 +16,7 @@
 
 import argparse
 from os.path import expanduser
-from tensorflow.compat.v1.io import gfile
+from tensorflow.compat.v1 import gfile
 from collections import Counter
 import nltk
 import numpy as np
@@ -186,8 +186,8 @@ def process_action(original_action):
 def score_human_data(flags):
   assert flags.true_data and flags.true_kb
   scores = []
-  expanded_kb = expanduser(flags.kb)
-  expanded_data = expanduser(flags.data)
+  expanded_kb = expanduser(flags.true_kb)
+  expanded_data = expanduser(flags.true_data)
   f2 = gfile.Open(expanded_kb)
   with gfile.Open(expanded_data) as f:
     for line in tqdm(f):
@@ -241,7 +241,7 @@ def score_selfplay(flags):
           true_json_obj = json.loads(true_line)
           kb = tokenize_kb(json.loads(kb_line))
           pred_action = ""
-          if 'action' in pred_json_obj:
+          if 'action' not in pred_json_obj:
             pred_action = "<unk> <unk> <unk> <unk>".split(' ')
           else:
             pred_action = action_obj_to_str(pred_json_obj['action']).split(' ')

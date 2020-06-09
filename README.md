@@ -7,11 +7,11 @@ research. This python library contains a collection of tookits that come with th
 
 ## Prerequisites
 #### General
-- python (verified on 2.7.16)
+- python (verified on 3.7)
 - wget
 
 #### Python Packages
-- tensorflow (tested on 1.14.0)
+- tensorflow (tested on 1.15.0)
 - tqdm
 - nltk
 - flask (for visualization)

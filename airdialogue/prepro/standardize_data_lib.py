@@ -14,7 +14,7 @@
 
 """library to standardize data."""
 
-from tensorflow.compat.v1 import gfile
+from tensorflow.compat.v1.io import gfile
 from tqdm import tqdm
 import string
 import json
@@ -97,20 +97,26 @@ def load_and_drop_stream(data_file, kb_file, drop_incorrect=True, verbose=False)
   """
   if verbose: print("loading stream")
   fin_data = gfile.GFile(data_file)
-  fin_kb = gfile.GFile(kb_file)
+  if gfile.exists(kb_file):
+    fin_kb = gfile.GFile(kb_file)
+  else:
+    fin_kb = None
   if verbose: print("gfile loaded: ", fin_data)
   for line1 in fin_data:
     if verbose: print(line1)
     if len(line1.strip()) < 10:
       continue
-    line2 = fin_kb.readline()
-    if len(line2.strip()) < 10:
-      continue
     line1 = delete_non_ascii(line1)
-    line2 = delete_non_ascii(line2)
-
     data_obj = json.loads(line1)
-    kb_obj = json.loads(line2)
+    
+    if fin_kb:
+      line2 = fin_kb.readline()
+      if len(line2.strip()) < 10:
+        continue
+      line2 = delete_non_ascii(line2)
+      kb_obj = json.loads(line2)
+    else:
+      kb_obj = None
     if (not drop_incorrect) or (
         'correct_sample' not in data_obj) or data_obj['correct_sample']:
       yield data_obj, kb_obj

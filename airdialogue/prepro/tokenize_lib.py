@@ -318,34 +318,43 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   for loaded_json in d:
     # loaded_json = json.loads(delete_non_ascii(line))
     # input_type
-    intent = loaded_json['intent']
-    action = loaded_json['action']
-    expected_action = loaded_json['expected_action']
-    processed_intent = tokenize_intent(get_full_intent(intent))
-    # print "processed_intent", processed_intent
-    processed_action = tokenize_action(
-        action,
-        first_name_cat,
-        last_name_cat,
-        flight_cat,
-        state_cat,
-    )
-    processed_expected_action = tokenize_action(
-        expected_action,
-        first_name_cat,
-        last_name_cat,
-        flight_cat,
-        state_cat,
-    )
-    # print "processed_action", processed_action
-    intents.append(processed_intent)
-    actions.append(processed_action)
-    expected_actions.append(processed_expected_action)
-    word_map = apply_word_map(processed_intent, word_map)
+    if 'intent' in loaded_json:
+      intent = loaded_json['intent']
+      processed_intent = tokenize_intent(get_full_intent(intent))
+      intents.append(processed_intent)
+      word_map = apply_word_map(processed_intent, word_map)
+    else:
+      intents.append('')
+    if 'action' in loaded_json and loaded_json['action']:
+      action = loaded_json['action']
+      processed_action = tokenize_action(
+          action,
+          first_name_cat,
+          last_name_cat,
+          flight_cat,
+          state_cat,
+      )
+      actions.append(processed_action)
+      word_map = apply_word_map(processed_action, word_map)
+    else:
+      actions.append('')
+    if 'expected_action' in loaded_json:
+      expected_action = loaded_json['expected_action']
+      # print "processed_intent", processed_intent
+      processed_expected_action = tokenize_action(
+          expected_action,
+          first_name_cat,
+          last_name_cat,
+          flight_cat,
+          state_cat,
+      )
+      # print "processed_action", processed_action
+      expected_actions.append(processed_expected_action)
+    
+    # NB for word map updates above:
     # word map should contain everything in the supervised eval and training
     # however, it should not contain expected_action since this is for self-play
     # it contains tokens that has _, on flights.
-    word_map = apply_word_map(processed_action, word_map)
 
     # process dialogue only when input_type is dialogue
     if input_type == 'dialogue':

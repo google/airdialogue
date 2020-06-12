@@ -188,7 +188,10 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
       drop_incorrect=not FLAGS.keep_incorrect,
       verbose=FLAGS.verbose), desc="processing stream"):
     # has to be there no matter what
-    processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
+    if raw_kb is not None:
+      processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
+    else:
+      processed_kb = [[]]
     # if dialogue, everything will be there.
     # if context, only intents, actions, vocal_map will be there
     result = process_main_data(
@@ -268,7 +271,7 @@ def main(FLAGS):
   nltk.data.path.append(nltk_path)
   sent_tokenize = nltk.sent_tokenize
 
-  infer_flag_exists = FLAGS.infer_src_data_file and FLAGS.infer_kb_file
+  infer_flag_exists = FLAGS.infer_src_data_file or FLAGS.infer_kb_file
 
   if any(j != 'infer' for j in all_jobs) or not infer_flag_exists:
     # We need to process the default json

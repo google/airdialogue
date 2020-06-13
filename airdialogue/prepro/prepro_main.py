@@ -88,6 +88,8 @@ def add_arguments(parser):
                       help='path for infer_src_data_file')
   parser.add_argument('--infer_kb_file', type=str, default=None,
                       help='path for infer_kb_file')
+  parser.add_argument('--self_play_start_turn', type=str, default=None,
+                      help='[agent|customer] whether agent or customer starts empty conversations')
 
 
 def generate_entry(intents, actions, expected_actions, dialogues, kbs,
@@ -178,7 +180,7 @@ def load_data_from_jsons(FLAGS, input_data_file, input_kb_file, output_vab,
   return data
 
 def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_vab,
-    output_all_vab, gen_cat, cat_files):
+    output_all_vab, gen_cat, cat_files, self_play_start_turn=None):
   vocal_map = {}
   sent_tokenize = nltk.sent_tokenize
   
@@ -191,7 +193,7 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
     if raw_kb is not None:
       processed_kb, vocal_map = process_kb([raw_kb], vocal_map, stream=True)
     else:
-      processed_kb = [[]]
+      processed_kb = [["no_res"]]
     # if dialogue, everything will be there.
     # if context, only intents, actions, vocal_map will be there
     result = process_main_data(
@@ -200,7 +202,8 @@ def load_data_from_jsons_stream(FLAGS, input_data_file, input_kb_file, output_va
         word_tokenize,
         vocal_map,
         stream=True,
-        input_type=FLAGS.input_type)
+        input_type=FLAGS.input_type,
+        self_play_start_turn=self_play_start_turn)
     intents, actions, expected_actions, dialogues, vocal_map, boundaries1, boundaries2, cats = result
     frequency_cutoff = FLAGS.word_cutoff
     # 3 is the number of special tokens
@@ -281,7 +284,7 @@ def main(FLAGS):
   if 'infer' in all_jobs and infer_flag_exists:
     # We need to process alternate infer json
     alt_infer_data = load_data_from_jsons_stream(FLAGS, FLAGS.infer_src_data_file,
-      FLAGS.infer_kb_file, None, None, False, [])
+      FLAGS.infer_kb_file, None, None, False, [], FLAGS.self_play_start_turn)
   if 'train' in all_jobs:
     if FLAGS.verbose:
       print('writing train data')

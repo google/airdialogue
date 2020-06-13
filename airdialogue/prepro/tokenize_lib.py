@@ -216,7 +216,8 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
 
 # Right now expected action is not used only one flight is considered.
 def process_main_data(raw_data, sent_tok, word_tok, word_map,
-                      input_type, stream=False):
+                      input_type, stream=False,
+                      self_play_start_turn=None):
   """This function processes the main data."""
 
   def process_dialogue(dialogue):
@@ -370,6 +371,13 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
       boundaries1.append(serialize_boundary(*t1_boundaries))
       boundaries2.append(serialize_boundary(
           *t2_boundaries))  # this is used only for inference files generation
+      if processed_dialogue == "" and \
+          self_play_start_turn in ['agent', 'customer']:
+        if self_play_start_turn == 'agent':
+          processed_dialogue = '<t2>'
+        else:
+          processed_dialogue = '<t1>'
+
       dialogues.append(processed_dialogue)
       length = len(processed_dialogue.split(' '))
       lengths.append(length)

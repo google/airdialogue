@@ -216,8 +216,12 @@ def score_inference(flags):
 
 def action_obj_to_str(o):
   fl = 'empty'
-  if o['flight']:
+  if 'flight' in o and o['flight']:
     fl = str(o['flight'][0])
+  if 'name' not in o:
+    o['name'] = '<unk> <unk>'
+  if 'status' not in o:
+    o['status'] = 'unk'
   return ' '.join([o['name'], "<fl_" + fl + ">", "<st_" + o['status'] + ">"])
 
 def json_obj_to_tokens(o):

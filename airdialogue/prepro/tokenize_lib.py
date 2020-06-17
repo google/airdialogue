@@ -56,6 +56,7 @@ def tokenize_kb(kb_json):
     for element in arr:
       list_of_action_tokens_except_name.add(element)
     return ' '.join(arr)
+
   if kb_json['reservation'] == 0:
     res = 'no_res'
   else:

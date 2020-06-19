@@ -260,8 +260,8 @@ def score_selfplay(flags):
           pred_raw_text = json_obj_to_tokens(pred_json_obj)
           true_raw_text = json_obj_to_tokens(true_json_obj)
 
-          b = 100 * compute_bleu([[true_raw_text]], [pred_raw_text])
-          bleu_scores.append(b[0])
+          b = compute_bleu([[true_raw_text]], [pred_raw_text])
+          bleu_scores.append(b[0] * 100)
 
   avg_score = np.mean(all_score)
   avg_bleu = np.mean(bleu_scores)

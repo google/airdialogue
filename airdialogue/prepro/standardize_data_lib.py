@@ -104,7 +104,8 @@ def load_and_drop_stream(data_file,
     fin_kb = gfile.GFile(kb_file)
   else:
     fin_kb = None
-  if verbose: print("gfile loaded: ", fin_data)
+  if verbose:
+    print('gfile loaded: ', fin_data)
   for line1 in fin_data:
     if verbose:
       print(line1)
@@ -112,7 +113,7 @@ def load_and_drop_stream(data_file,
       continue
     line1 = delete_non_ascii(line1)
     data_obj = json.loads(line1)
-    
+
     if fin_kb:
       line2 = fin_kb.readline()
       if len(line2.strip()) < 10:

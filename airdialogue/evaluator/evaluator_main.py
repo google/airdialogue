@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """This module builds a falsk server for visualization."""
 
 import argparse
@@ -34,6 +33,7 @@ from tqdm import tqdm
 import tensorflow.compat.v1 as tf
 
 FLAGS = None
+
 
 def add_arguments(parser):
   """Build ArgumentParser."""
@@ -106,8 +106,8 @@ def distance_calculator(flight1, flight2, flight_db):  # flight2 is benchmark
     b = flight_2_actual[i]
     if i in category_set:
       if i == 11:
-        total += airline_list[a.split('_')[1].split(
-            '>')[0]] != airline_list[b.split('_')[1].split('>')[0]]
+        total += airline_list[a.split('_')[1].split('>')[0]] != airline_list[
+            b.split('_')[1].split('>')[0]]
       else:
         total += a != b
     else:
@@ -208,8 +208,9 @@ def score_human_data(flags):
   sn = np.array(scores)
   # np.mean(sn[:,0]), np.mean(sn[:,1]),np.mean(sn[:,2]),np.mean(sn[:,3])
   score = np.mean(sn[:, 0])
-  print('final score',score)
+  print('final score', score)
   return {'score': score}
+
 
 def score_inference(flags):
   assert flags.true_data and flags.pred_data
@@ -225,6 +226,7 @@ def score_inference(flags):
       results[metric] = infer_result
   return results
 
+
 def action_obj_to_str(o):
   fl = 'empty'
   if 'flight' in o and o['flight']:
@@ -233,14 +235,16 @@ def action_obj_to_str(o):
     o['name'] = '<unk> <unk>'
   if 'status' not in o:
     o['status'] = 'unk'
-  return ' '.join([o['name'], "<fl_" + fl + ">", "<st_" + o['status'] + ">"])
+  return ' '.join([o['name'], '<fl_' + fl + '>', '<st_' + o['status'] + '>'])
+
 
 def json_obj_to_tokens(o):
-  d = o["dialogue"]
-  decapped = [" ".join(s.split(":")[1:]).strip() for s in d]
-  one_string = " ".join(decapped)
+  d = o['dialogue']
+  decapped = [' '.join(s.split(':')[1:]).strip() for s in d]
+  one_string = ' '.join(decapped)
   tokenized = nltk.word_tokenize(one_string)
   return tokenized
+
 
 def score_selfplay(flags):
   assert flags.true_data and flags.true_kb and flags.pred_data
@@ -255,9 +259,9 @@ def score_selfplay(flags):
           pred_json_obj = json.loads(pred_line)
           true_json_obj = json.loads(true_line)
           kb = tokenize_kb(json.loads(kb_line))
-          pred_action = ""
+          pred_action = ''
           if 'action' not in pred_json_obj:
-            pred_action = "<unk> <unk> <unk> <unk>".split(' ')
+            pred_action = '<unk> <unk> <unk> <unk>'.split(' ')
           else:
             pred_action = action_obj_to_str(pred_json_obj['action']).split(' ')
           true_action = action_obj_to_str(true_json_obj['action']).split(' ')
@@ -267,15 +271,15 @@ def score_selfplay(flags):
           pred_raw_text = json_obj_to_tokens(pred_json_obj)
           true_raw_text = json_obj_to_tokens(true_json_obj)
 
-          _b = compute_bleu([[true_raw_text]], [pred_raw_text])
-          bleu_scores.append(_b[0])
+          b = compute_bleu([[true_raw_text]], [pred_raw_text])
+          bleu_scores.append(b[0] * 100)
 
   avg_score = np.mean(all_score)
   avg_bleu = np.mean(bleu_scores)
-  print("score=", avg_score)
-  print("bleu=", avg_bleu)
+  print('score=', avg_score)
+  print('bleu=', avg_bleu)
 
-  return {"score": avg_score, "bleu": avg_bleu}
+  return {'score': avg_score, 'bleu': avg_bleu}
 
 
 def main(flags):
@@ -292,6 +296,7 @@ def main(flags):
 
 def run_main(unused):
   main(FLAGS)
+
 
 if __name__ == '__main__':
   this_parser = argparse.ArgumentParser()

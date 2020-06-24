@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """library file for tokenize."""
 
 import nltk
 import numpy as np
 from tensorflow.compat.v1 import gfile
 from tqdm import tqdm
-
 
 start_of_turn1 = '<t1>'
 start_of_turn2 = '<t2>'
@@ -173,7 +171,7 @@ def tokenize_intent(intent_json):
 
 
 def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
-                     state_cat):
+                    state_cat):
   """Both name and flight will always be in the action.
 
   Context might have
@@ -216,8 +214,12 @@ def tokenize_action(action_json, first_name_cat, last_name_cat, flight_cat,
 
 
 # Right now expected action is not used only one flight is considered.
-def process_main_data(raw_data, sent_tok, word_tok, word_map,
-                      input_type, stream=False,
+def process_main_data(raw_data,
+                      sent_tok,
+                      word_tok,
+                      word_map,
+                      input_type,
+                      stream=False,
                       self_play_start_turn=None):
   """This function processes the main data."""
 
@@ -352,7 +354,7 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
       )
       # print "processed_action", processed_action
       expected_actions.append(processed_expected_action)
-    
+
     # NB for word map updates above:
     # word map should contain everything in the supervised eval and training
     # however, it should not contain expected_action since this is for self-play
@@ -363,16 +365,13 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
       dialogue = loaded_json['dialogue']
       processed_dialogue, max_diag_len_this = process_dialogue(dialogue)
       max_diag_length = max(max_diag_length, max_diag_len_this)
-      t1_boundaries = get_dialogue_boundary(start_of_turn1,
-                                            processed_dialogue)
-      t2_boundaries = get_dialogue_boundary(start_of_turn2,
-                                            processed_dialogue)
-      max_turn1 = max(max_turn1,
-                      len(t1_boundaries[0]) + len(t2_boundaries[0]))
+      t1_boundaries = get_dialogue_boundary(start_of_turn1, processed_dialogue)
+      t2_boundaries = get_dialogue_boundary(start_of_turn2, processed_dialogue)
+      max_turn1 = max(max_turn1, len(t1_boundaries[0]) + len(t2_boundaries[0]))
       boundaries1.append(serialize_boundary(*t1_boundaries))
       boundaries2.append(serialize_boundary(
           *t2_boundaries))  # this is used only for inference files generation
-      if processed_dialogue == "" and \
+      if processed_dialogue == '' and \
           self_play_start_turn in ['agent', 'customer']:
         if self_play_start_turn == 'agent':
           processed_dialogue = '<t2>'
@@ -387,9 +386,11 @@ def process_main_data(raw_data, sent_tok, word_tok, word_map,
   if input_type == 'dialogue' and not stream:  #  output stats only when input is dialogue
     min_length, mean_length, max_length = np.min(lengths), np.mean(
         lengths), np.max(lengths)
-    print(("min_len: ${0}, mean_len: {1}, max_len: {2}"
-          "max_sent_len: {3}, max_turn: {4}").format(min_length, mean_length,
-          max_length, max_diag_length, max_turn1))
+    print(
+        ('min_len: ${0}, mean_len: {1}, max_len: {2}'
+         'max_sent_len: {3}, max_turn: {4}').format(min_length, mean_length,
+                                                    max_length, max_diag_length,
+                                                    max_turn1))
 
   # return all the processed data. Some of them will be empty arrays when in
   # context mode.
@@ -416,18 +417,19 @@ def write_vocabulary(output_file, output_all_vocab_file, word_frequency,
 
   # first one should always be unktoken
   for special_char in special_chars:
-    if f: f.write(special_char + '\n')
+    if f:
+      f.write(special_char + '\n')
   for key in word_frequency:
     # We write to the vocabulary only when the key is not empty.
     # Otherwise tensorflow will complain.
-    if word_frequency[
-        key] >= frequency_cutoff and (key not in special_chars) and is_ascii(
-            key, keep_non_ascii) and key:
+    if word_frequency[key] >= frequency_cutoff and (
+        key not in special_chars) and is_ascii(key, keep_non_ascii) and key:
       if f:
         f.write(key + '\n')
       new_word_frequency.add(key)
 
-  if f: f.close()
+  if f:
+    f.close()
   # all vocab
   if output_all_vocab_file:
     with gfile.Open(output_all_vocab_file, 'w') as f2:
@@ -450,12 +452,11 @@ def write_data(data, output_file_data, output_file_kb, alt_infer=False):
     f_kb.write(flatten_json(entry['kb']) + '\n')
     new_arr = []
     if alt_infer:
-      new_arr = [
-          entry['intent'], entry['dialogue'].replace("<eod> ", "")
-      ]
+      new_arr = [entry['intent'], entry['dialogue'].replace('<eod> ', '')]
     else:
       new_arr = [
-        entry['intent'], entry['action'], entry['dialogue'], entry['boundaries1']
+          entry['intent'], entry['action'], entry['dialogue'],
+          entry['boundaries1']
       ]
       # only boundary1 is used but not 2 because it's not necessary.
     f_data.write('|'.join(new_arr) + '\n')

@@ -24,18 +24,22 @@ ROLE_TOKENS=['<t1>','<t2>']
 
 def evaluate(ref_file, trans_file, metric):
   """Pick a metric and evaluate depending on task."""
+  if ":" in metric:
+      metric,mode = metric.split(":")
+  else:
+      mode = None
   # BLEU scores for translation task
   if metric.lower() == "bleu":
     evaluation_score = _bleu(
-        ref_file, trans_file)
+        ref_file, trans_file, mode=mode)
   # ROUGE scores for summarization tasks
   elif metric.lower() == "rouge":
     evaluation_score = _rouge(
-        ref_file, trans_file)
+        ref_file, trans_file, mode=mode)
   # kl scores for evaluating the ngram kl distribution of the whole corpus
   elif metric.lower() == "kl":
     evaluation_score = _kl(
-        ref_file, trans_file)
+        ref_file, trans_file, mode=mode)
   elif metric.lower() == "accuracy":
     evaluation_score = _accuracy(ref_file, trans_file)
   else:
@@ -43,10 +47,10 @@ def evaluate(ref_file, trans_file, metric):
 
   return evaluation_score
 
-def _kl(ref_file, trans_file):
+def _kl(ref_file, trans_file, mode=None):
   """Compute KL divergence and handling BPE."""
   max_order = 4
-    
+
   ref_files = [ref_file]
   reference_text = []
   role_tokens = []
@@ -62,12 +66,14 @@ def _kl(ref_file, trans_file):
   with codecs.getreader("utf-8")(tf.gfile.GFile(trans_file, "rb")) as fh:
     for line in fh:
       translations.append(line.rstrip().split(" "))
-  
+
   results = {}
   kl_scores = kl.compute_kl(reference_text, translations, max_order)
   for key in kl_scores:
     results['all-'+key] = kl_scores[key]
-    
+  if mode=="brief":
+      return sum(results.values())/len(results)
+
   for role in ROLE_TOKENS:
     _sub_ref_texts = []
     _sub_trans = []
@@ -80,7 +86,7 @@ def _kl(ref_file, trans_file):
       results[role+'-'+key] = kl_scores[key]
   return results
 
-def _bleu(ref_file, trans_file):
+def _bleu(ref_file, trans_file, mode=None):
   """Compute BLEU scores and handling BPE."""
   max_order = 4
   smooth = False
@@ -111,6 +117,8 @@ def _bleu(ref_file, trans_file):
   bleu_score, _, _, _, _, _ = bleu.compute_bleu(per_segment_references,
                                                 translations, max_order, smooth)
   results['all'] = 100 * bleu_score
+  if mode=="brief":
+      return results['all']
 
   for role in ROLE_TOKENS:
     _sub_ref_texts = []
@@ -125,8 +133,9 @@ def _bleu(ref_file, trans_file):
   return results
 
 
-def _rouge(ref_file, summarization_file):
+def _rouge(ref_file, summarization_file, mode=None):
   """Compute ROUGE scores and handling BPE."""
+  raise NotImplementedError("Not tested")
 
   references = []
   with codecs.getreader("utf-8")(tf.gfile.GFile(ref_file, "rb")) as fh:
@@ -146,7 +155,7 @@ def _rouge(ref_file, summarization_file):
 def process_dialogue_infer(file_line, get_role_token=False):
   # split the end token (<t1>,<t2>)
   _line = file_line.replace(' <eod>','')
-  _line = _line.rstrip().split("|")[1].rsplit(' ', 1)  
+  _line = _line.rstrip().split("|")[1].rsplit(' ', 1)
   if not get_role_token:
     return _line[0]
   else:

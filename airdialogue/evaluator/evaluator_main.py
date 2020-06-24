@@ -51,8 +51,8 @@ def add_arguments(parser):
   parser.add_argument(
       '--infer_metrices',
       type=str,
-      default='bleu',
-      help='For infer task, choose one of multiple metric in (bleu|rouge|kl)')
+      default='bleu:brief',
+      help='For infer task, choose one of multiple metric in (bleu|rouge|kl) or (bleu:brief|kl:brief), this will give you a single number metric')
   parser.add_argument(
       '--output',
       type=str,

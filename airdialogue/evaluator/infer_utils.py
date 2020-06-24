@@ -47,7 +47,7 @@ def evaluate(ref_file, trans_file, metric):
 
   return evaluation_score
 
-def _kl(ref_file, trans_file, mode=None):
+def _kl(ref_file, trans_file, mode="brief"):
   """Compute KL divergence and handling BPE."""
   max_order = 4
 
@@ -86,7 +86,7 @@ def _kl(ref_file, trans_file, mode=None):
       results[role+'-'+key] = kl_scores[key]
   return results
 
-def _bleu(ref_file, trans_file, mode=None):
+def _bleu(ref_file, trans_file, mode="brief"):
   """Compute BLEU scores and handling BPE."""
   max_order = 4
   smooth = False
@@ -133,7 +133,7 @@ def _bleu(ref_file, trans_file, mode=None):
   return results
 
 
-def _rouge(ref_file, summarization_file, mode=None):
+def _rouge(ref_file, summarization_file, mode="brief"):
   """Compute ROUGE scores and handling BPE."""
   raise NotImplementedError("Not tested")
 

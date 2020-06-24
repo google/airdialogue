@@ -222,7 +222,7 @@ def score_inference(flags):
 
   for metric in infer_metrices:
       infer_result = evaluate_infer(expanded_true_data, expanded_pred_data, metric)
-      print('infer ',metric,': ', infer_result)
+      print('infer ',metric.split[":"][0],': ', infer_result)
       results[metric] = infer_result
   return results
 

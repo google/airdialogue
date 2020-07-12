@@ -5,6 +5,11 @@ research. This python library contains a collection of tookits that come with th
 - [AirDialogue dataset][data]
 - Reference implementation: [AirDialogue Model][airdialogue_model]
 
+## What's New
+
+- Jul 12,2020: We update the [AirDialogue dataset][data] to version v1.1. We fixed typos, misalignment between KB file and dialogue file. Please download and use the new data.
+
+
 ## Prerequisites
 #### General
 - python (verified on 3.7)

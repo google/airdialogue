@@ -226,17 +226,15 @@ def score_inference(flags):
       results[metric] = infer_result
   return results
 
-
 def action_obj_to_str(o):
-  fl = 'empty'
+  fl = ['empty']
   if 'flight' in o and o['flight']:
-    fl = str(o['flight'][0])
+    fl = [str(f) for f in o['flight']]
   if 'name' not in o:
     o['name'] = '<unk> <unk>'
   if 'status' not in o:
     o['status'] = 'unk'
-  return ' '.join([o['name'], '<fl_' + fl + '>', '<st_' + o['status'] + '>'])
-
+  return o['name'], "_".join(['<fl_' + f + '>' for f in fl]), '<st_' + o['status'] + '>'
 
 def json_obj_to_tokens(o):
   d = o['dialogue']
@@ -263,8 +261,8 @@ def score_selfplay(flags):
           if 'action' not in pred_json_obj:
             pred_action = '<unk> <unk> <unk> <unk>'.split(' ')
           else:
-            pred_action = action_obj_to_str(pred_json_obj['action']).split(' ')
-          true_action = action_obj_to_str(true_json_obj['action']).split(' ')
+            pred_action = action_obj_to_str(pred_json_obj['action'])
+          true_action = action_obj_to_str(true_json_obj['expected_action'])
           score = compute_reward2(pred_action, true_action, kb)
           all_score.append(score)
 

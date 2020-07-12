@@ -27,7 +27,7 @@ def evaluate(ref_file, trans_file, metric):
   if ":" in metric:
       metric,mode = metric.split(":")
   else:
-      mode = None
+      mode = "brief"
   # BLEU scores for translation task
   if metric.lower() == "bleu":
     evaluation_score = _bleu(

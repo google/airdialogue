@@ -28,6 +28,7 @@ def evaluate(ref_file, trans_file, metric):
       metric,mode = metric.split(":")
   else:
       mode = "brief"
+  assert mode in ["brief","all"]
   # BLEU scores for translation task
   if metric.lower() == "bleu":
     evaluation_score = _bleu(
@@ -135,12 +136,16 @@ def _bleu(ref_file, trans_file, mode="brief"):
 
 def _rouge(ref_file, summarization_file, mode="brief"):
   """Compute ROUGE scores and handling BPE."""
-  raise NotImplementedError("Not tested")
+
+  results = {}
 
   references = []
+  role_tokens = []
   with codecs.getreader("utf-8")(tf.gfile.GFile(ref_file, "rb")) as fh:
     for line in fh:
-      references.append(process_dialogue_infer(line))
+      ref,role = process_dialogue_infer(line.rstrip(), get_role_token=True)
+      references.append(ref)
+      role_tokens.append(role)
 
   hypotheses = []
   with codecs.getreader("utf-8")(tf.gfile.GFile(summarization_file,
@@ -149,7 +154,21 @@ def _rouge(ref_file, summarization_file, mode="brief"):
       hypotheses.append(line)
 
   rouge_score_map = rouge.rouge(hypotheses, references)
-  return 100 * rouge_score_map["rouge_l/f_score"]
+  results['all'] = 100 * rouge_score_map["rouge_l/f_score"]
+  if mode=="brief":
+      return results['all']
+
+  for role in ROLE_TOKENS:
+    _sub_ref_texts = []
+    _sub_hypos = []
+    for _r,_t,_role in zip(references, hypotheses, role_tokens):
+      if _role == role:
+        _sub_ref_texts.append(_r)
+        _sub_hypos.append(_t)
+    rouge_score_map = rouge.rouge(_sub_hypos, _sub_ref_texts)
+    results[role] = 100 * rouge_score_map["rouge_l/f_score"]
+
+  return results
 
 
 def process_dialogue_infer(file_line, get_role_token=False):
@@ -169,7 +188,7 @@ def _accuracy(label_file, pred_file):
     with codecs.getreader("utf-8")(tf.gfile.GFile(pred_file, "rb")) as pred_fh:
       count = 0.0
       match = 0.0
-      for label in zip(label_fh, pred_fh):
+      for label, pred in zip(label_fh, pred_fh):
         label = process_dialogue_infer(label.strip()).strip()
         pred = pred.strip()
         if label == pred:

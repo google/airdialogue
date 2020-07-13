@@ -49,7 +49,7 @@ def add_arguments(parser):
       default='infer',
       help='type of the task, one of |human|infer|selfplay|')
   parser.add_argument(
-      '--infer_metrices',
+      '--infer_metrics',
       type=str,
       default='bleu:brief',
       help='For infer task, choose one of multiple metric in (bleu:all|rouge:all|kl:all) or (bleu:brief|kl:brief),'
@@ -90,10 +90,10 @@ def score_inference(flags):
   expanded_true_data = expanduser(flags.true_data)
   expanded_pred_data = expanduser(flags.pred_data)
 
-  infer_metrices = flags.infer_metrices.split(',')
+  infer_metrics = flags.infer_metrics.split(',')
   results = {}
 
-  for metric in infer_metrices:
+  for metric in infer_metrics:
       infer_result = evaluate_infer(expanded_true_data, expanded_pred_data, metric)
       metric = metric.split(":")[0]
       print('infer ', metric, ': ', infer_result)

@@ -7,6 +7,7 @@ research. This python library contains a collection of tookits that come with th
 
 ## What's New
 
+- Jul 13,2020: Fixed a bug in BLEU evaluation. The current version gives higher BLEU scores. Support evaluation for different roles and add KL-divergence metric (see `--infer_metrics`).
 - Jul 12,2020: We update the [AirDialogue dataset][data] to version v1.1. We fixed typos, misalignment between KB file and dialogue file. Please download and use the new data.
 
 

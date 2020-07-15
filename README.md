@@ -5,6 +5,12 @@ research. This python library contains a collection of tookits that come with th
 - [AirDialogue dataset][data]
 - Reference implementation: [AirDialogue Model][airdialogue_model]
 
+## What's New
+
+- Jul 13,2020: Fixed a bug in BLEU evaluation. The current version gives higher BLEU scores. Support evaluation for different roles and add KL-divergence metric (see `--infer_metrics`).
+- Jul 12,2020: We update the [AirDialogue dataset][data] to version v1.1. We fixed typos, misalignment between KB file and dialogue file. Please download and use the new data.
+
+
 ## Prerequisites
 #### General
 - python (verified on 3.7)
@@ -32,8 +38,12 @@ python setup.py install
 The official scoring function evaluates the predictive results for a trained model and compare it to the AirDialogue dataset.
 
 ```
-airdialogue score --true_data PATH_TO_DATA_FILE --true_kb PATH_TO_KB_FILE
+airdialogue score --true_data PATH_TO_DATA_FILE --true_kb PATH_TO_KB_FILE \
+    --infer_metrics bleu
 ```
+
+`--infer_metrics` can be one of (bleu:all|rouge:all|kl:all|bleu:brief|kl:brief).
+`brief` mode gives a single number metric. (bleu|kl) is equivalent to (belu:brief|kl:brief)
 
 #### Context Generation
 Context generator generates a valid context-action pair without conversatoin history.

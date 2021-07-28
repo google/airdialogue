@@ -19,7 +19,7 @@ with open("README.md", "r") as fh:
   long_description = fh.read()
 
 setuptools.setup(
-    name="airdialogue",
+    name="airdialogue-essentials",
     version="0.1",
     scripts=["airdialogue/bin/airdialogue"],
     author="Wei Wei",

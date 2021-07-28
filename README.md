@@ -23,10 +23,10 @@ research. This python library contains a collection of tookits that come with th
 - flask (for visualization)
 
 ## Install
-<!-- To install the pre-build version from pip, use
+To install the pre-build version from pip, use
 ```
-pip install airdialogue
-``` -->
+pip install airdialogue-essentials
+```
 
 To install the bleeding edge from github, use
 ```

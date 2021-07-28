@@ -81,7 +81,7 @@ Visualization tool displays the content of the raw json file.
 airdialogue vis --data_path ./data/airdialogue/json/
 ```
 
-#### Codalab simulator
+<!-- #### Codalab simulator
 To simulate running the Codalab selfplay workflow, you can run the following script that replicates the bundle workflow
 for the competition. This requires a `model/scripts/codalab_selfplay_step.sh` that can be run as
 
@@ -93,7 +93,7 @@ More details can be found on the [Airdialogue competition tutorial worksheet][ai
 
 ```bash
 bash airdialogue/codalab/simulate_codalab.sh <path_to_data>/json/dev_data.json <path_to_data>/json/dev_kb.json <model_folder>
-```
+``` -->
 
 [data]: https://storage.googleapis.com/airdialogue/airdialogue_data.tar.gz
 [paper]: https://www.aclweb.org/anthology/D18-1419/

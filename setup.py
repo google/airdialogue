@@ -27,7 +27,7 @@ setuptools.setup(
     description="airdialogue package",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/javatechy/dokr",
+    url="https://github.com/google/airdialogue",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 2",
